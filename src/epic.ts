@@ -82,14 +82,13 @@ function kiiSend(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Promise<
 }
 
 const connectEpic = (a: ActionsObservable<any>, store: any) => a.ofType('CONNECT')
-      .map(action => Rx.Observable.fromPromise(
-        kiiPush().then(conf => {
-          return kiiTopic(action.payload, "status")
+      .mergeMap(action => Rx.Observable.fromPromise(
+        kiiPush().then(conf =>
+          kiiTopic(action.payload, "status")
             .then(topic => kiiWS(conf, store)
-              .then((_: any) => kiiSend(topic as KiiTopic)))
-        })
+              .then(_ => kiiSend(topic as KiiTopic)))
+        )
       ))
-      .flatMap(x => x)
       .map(payload => ({type: 'CONNECT.succeeded', payload}))
 
 function inviteUser(invitee: string): Promise<KiiGroup> {
