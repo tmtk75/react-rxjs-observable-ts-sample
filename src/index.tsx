@@ -10,7 +10,6 @@ import 'rxjs/add/operator/mapTo'
 import 'rxjs/add/operator/filter'
 import 'rxjs/add/operator/delay'
 
-import { FlatButton, TextField } from "material-ui"
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import * as injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
@@ -20,67 +19,7 @@ import { remote } from 'electron'
 const { kiicloud: { appID, appKey, apiEndpoint }, github: { token } } = remote.getGlobal('config');
 Kii.initializeWithSite(appID, appKey, apiEndpoint);
 
-class App extends React.Component<any, any> {
-  constructor(props: any) {
-    super(props);
-    this.state = {
-      username: "tmtk75",
-      password: "abc123",
-      github_token: token,
-    }
-  }
-  render() {
-    const { dispatch, kiicloud: { user, group } } = this.props;
-    return (
-      <div>
-        <TextField
-          name="username"
-          floatingLabelText="username"
-          value={this.state.username}
-          onChange={(e: React.FormEvent<TextField>) => this.setState({username: (e.target as any).value})}
-          />
-        <TextField
-          type="password"
-          name="password"
-          floatingLabelText="password"
-          value={this.state.password}
-          onChange={(e: React.FormEvent<TextField>) => this.setState({password: (e.target as any).value})}
-          />
-        <FlatButton
-          label="sign up"
-          onClick={() => dispatch(createAction("SIGN-UP")({
-            username: this.state.username,
-            password: this.state.password,
-          }))}
-          />
-        <FlatButton
-          label="sign in"
-          onClick={() => dispatch(createAction("SIGN-IN")({
-            username: this.state.username,
-            password: this.state.password,
-          }))}
-          />
-        <TextField
-          name="github_token"
-          floatingLabelText="github_token"
-          value={this.state.github_token}
-          onChange={(e: React.FormEvent<TextField>) => this.setState({github_token: (e.target as any).value})}
-          />
-        <FlatButton
-          label="join"
-          onClick={() => dispatch(createAction("JOIN")({
-            github_token: this.state.github_token,
-          }))}
-          />
-        <hr />
-        <div>
-          <div>user: {user ? user.getUsername() : null}</div>
-          <div>group: {group ? group.getName() : null}</div>
-        </div>
-      </div>
-    )
-  }
-}
+import App from "./app"
 
 const kiicloud = handleActions({
   "SIGN-UP.succeeded":  (state: any, action: Action<any>) => {
@@ -143,7 +82,7 @@ const MyApp = connect((a: any) => a)(App);
 ReactDOM.render(
   <MuiThemeProvider>
     <Provider store={store}>
-      <MyApp />
+      <MyApp {...{token}} />
     </Provider>
   </MuiThemeProvider>
   , document.getElementById('main')
