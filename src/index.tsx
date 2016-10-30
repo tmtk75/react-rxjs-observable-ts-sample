@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom"
 import { createStore, applyMiddleware, combineReducers } from "redux"
 import { Provider, connect } from "react-redux"
 import { createAction, handleActions, Action } from "redux-actions"
-import { createEpicMiddleware, ActionsObservable } from 'redux-observable'
+import { createEpicMiddleware, combineEpics, ActionsObservable } from 'redux-observable'
 import * as Rx from "rxjs"
 import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/mapTo'
@@ -50,6 +50,13 @@ class App extends React.Component<any, any> {
             password: this.state.password,
           }))}
           />
+        <FlatButton
+          label="sign in"
+          onClick={() => dispatch(createAction("SIGN-IN")({
+            username: this.state.username,
+            password: this.state.password,
+          }))}
+          />
       </div>
     )
   }
@@ -57,6 +64,10 @@ class App extends React.Component<any, any> {
 
 const pingPong = handleActions({
   "SIGN-UP.succeeded":  (state: any, action: Action<any>) => {
+    console.log(action);
+    return Object.assign({}, state, {user: action.payload});
+  },
+  "SIGN-IN.succeeded":  (state: any, action: Action<any>) => {
     console.log(action);
     return Object.assign({}, state, {user: action.payload});
   },
@@ -69,7 +80,15 @@ const signUpEpic = (a: ActionsObservable<any>) => a.ofType('SIGN-UP')
       //.do(x => console.log("x:", x))
       .map(payload => ({type: 'SIGN-UP.succeeded', payload}))
 
-const rootEpic = signUpEpic;
+const signInEpic = (a: ActionsObservable<any>) => a.ofType('SIGN-IN')
+      .map(x => Rx.Observable.fromPromise(
+        KiiUser.authenticate(x.payload.username, x.payload.password)
+      ))
+      .flatMap(x => x)
+      //.do(x => console.log("x:", x))
+      .map(payload => ({type: 'SIGN-IN.succeeded', payload}))
+
+const rootEpic = combineEpics(signUpEpic, signInEpic);
 
 const devtools = (window as any).devToolsExtension && (window as any).devToolsExtension()
 const middlewares = applyMiddleware(
