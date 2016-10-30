@@ -11,6 +11,9 @@ const kiicloud = handleActions({
   "JOIN.succeeded":  (state: any, action: Action<any>) => {
     return Object.assign({}, state, action.payload);
   },
+  "MESSAGE-ARRIVED":  (state: any, action: Action<any>) => {
+    return Object.assign({}, state, {receivedMessage: action.payload});
+  },
 }, {} /* initial state */)
 
 export const reducer = combineReducers({

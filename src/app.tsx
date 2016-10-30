@@ -56,7 +56,7 @@ export default class App extends React.Component<any, any> {
           />
         <FlatButton
           label="connect"
-          onClick={() => dispatch(createAction("CONNECT")())}
+          onClick={() => dispatch(createAction("CONNECT")(group))}
           />
         <hr />
         <div>
