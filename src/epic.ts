@@ -1,8 +1,5 @@
 import * as Rx from "rxjs"
 import 'rxjs/add/operator/map'
-import 'rxjs/add/operator/mapTo'
-import 'rxjs/add/operator/filter'
-import 'rxjs/add/operator/delay'
 import { combineEpics, ActionsObservable } from 'redux-observable'
 import * as Paho from "paho"
 import {
@@ -10,16 +7,14 @@ import {
 } from "kii-sdk"
 
 const signUpEpic = (a: ActionsObservable<any>) => a.ofType('SIGN-UP')
-      .map(x => Rx.Observable.fromPromise(
+      .mergeMap(x => Rx.Observable.fromPromise(
         KiiUser.userWithUsername(x.payload.username, x.payload.password).register()))
-      .flatMap(x => x)
       .map(payload => ({type: 'SIGN-UP.succeeded', payload}))
 
 const signInEpic = (a: ActionsObservable<any>) => a.ofType('SIGN-IN')
-      .map(x => Rx.Observable.fromPromise(
+      .mergeMap(x => Rx.Observable.fromPromise(
         KiiUser.authenticate(x.payload.username, x.payload.password)
       ))
-      .flatMap(x => x)
       .map(payload => ({type: 'SIGN-IN.succeeded', payload}))
 
 function join(token: string): Promise<{user: KiiUser, group: KiiGroup} | Error> {
@@ -38,8 +33,7 @@ function join(token: string): Promise<{user: KiiUser, group: KiiGroup} | Error> 
 }
 
 const joinEpic = (a: ActionsObservable<any>) => a.ofType('JOIN')
-      .map(x => Rx.Observable.fromPromise(join(x.payload.github_token)))
-      .flatMap(x => x)
+      .mergeMap(x => Rx.Observable.fromPromise(join(x.payload.github_token)))
       .map(payload => ({type: 'JOIN.succeeded', payload}))
 
 function kiiPush(): Promise<any | Error> {
