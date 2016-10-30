@@ -2,6 +2,7 @@ module.exports = {
 
   entry: {
     bundle: "./src/index.tsx",
+    a: "./src/a.ts",
   },
 
   output: {
