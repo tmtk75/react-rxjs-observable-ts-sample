@@ -1,9 +1,0 @@
-default: dev-jp3
-profiles:
-  dev-jp3:
-    app_id: 2cdc6549
-    app_key: 3dbc623c48196a1d61ef039996a40519
-    client_id: 023bcf5d237e29adec3a232332087270
-    client_secret: 0678da89352c3db78dc01d31939a60c0a13516ad4daf05b2aa0f972deb2a6f63
-    api_endpoint: https://api-development-jp.internal.kii.com/api
-    log_endpoint: wss://apilog-development-jp.internal.kii.com:443/logs
