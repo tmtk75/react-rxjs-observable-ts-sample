@@ -12,7 +12,7 @@ export default class App extends React.Component<any, any> {
     }
   }
   render() {
-    const { dispatch, kiicloud: { user, group } } = this.props;
+    const { dispatch, kiicloud: { user, group }, message: { value } } = this.props;
     return (
       <div>
         <TextField
@@ -62,6 +62,7 @@ export default class App extends React.Component<any, any> {
         <div>
           <div>user: {user ? user.getUsername() : null}</div>
           <div>group: {group ? group.getName() : null}</div>
+          <div>received-message: {value ? value.toString() : null}</div>
         </div>
       </div>
     )
