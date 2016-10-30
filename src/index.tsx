@@ -30,7 +30,7 @@ class App extends React.Component<any, any> {
     }
   }
   render() {
-    const { dispatch } = this.props;
+    const { dispatch, kiicloud: { user, group } } = this.props;
     return (
       <div>
         <TextField
@@ -72,12 +72,17 @@ class App extends React.Component<any, any> {
             github_token: this.state.github_token,
           }))}
           />
+        <hr />
+        <div>
+          <div>user: {user ? user.getUsername() : null}</div>
+          <div>group: {group ? group.getName() : null}</div>
+        </div>
       </div>
     )
   }
 }
 
-const pingPong = handleActions({
+const kiicloud = handleActions({
   "SIGN-UP.succeeded":  (state: any, action: Action<any>) => {
     return Object.assign({}, state, {user: action.payload});
   },
@@ -110,7 +115,7 @@ function join(token: string): Promise<{user: KiiUser, group: KiiGroup}> {
         throw new Error(v.error)
       return v
     })
-    .then(({login, groups: [g]}) => Promise.all([
+    .then(({ login, groups: [g] }) => Promise.all([
       KiiUser.findUserByUsername(login),
       KiiGroup.groupWithID(g).refresh(),
     ]))
@@ -129,7 +134,10 @@ const devtools = (window as any).devToolsExtension && (window as any).devToolsEx
 const middlewares = applyMiddleware(
   createEpicMiddleware(rootEpic),
 )
-const store = createStore(pingPong, devtools, middlewares);
+const reducer = combineReducers({
+  kiicloud,
+})
+const store = createStore(reducer, devtools, middlewares);
 const MyApp = connect((a: any) => a)(App);
 
 ReactDOM.render(

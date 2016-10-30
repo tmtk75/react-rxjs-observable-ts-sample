@@ -3,7 +3,7 @@ module.exports = {
   target: "electron",
 
   entry: {
-    bundle: "./src/index.tsx",
+    bundle: "./src/bundle.js",
     a: "./src/a.ts",
   },
 
@@ -25,6 +25,7 @@ module.exports = {
     loaders: [
       { test: /\.js$/,   loader: 'babel?cacheDirectory', exclude: /node_modules/ },
       { test: /\.tsx?$/, loader: "ts-loader" },
+      { test: /\.styl$/, loader: 'style!css!stylus' },
     ]
   },
 

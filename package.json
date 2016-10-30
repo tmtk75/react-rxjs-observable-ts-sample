@@ -7,7 +7,7 @@
     "start": "electron .",
     "build": "webpack --progress --colors",
     "build:watch": "webpack --watch --progress --colors",
-	  "kii:build": "webpack --progress --colors --config ./src/kiicloud/webpack.config.js",
+    "kii:build": "webpack --progress --colors --config ./src/kiicloud/webpack.config.js",
     "kii:deploy": "kii-cli servercode deploy dist/kii-servercode.js",
     "kii:build-deploy": "npm run kii:build; npm run kii:deploy",
     "distclean": "rm -rf dist"
@@ -23,6 +23,7 @@
     "babel-core": "^6.18.0",
     "babel-loader": "^6.2.7",
     "babel-preset-es2015": "^6.18.0",
+    "css-loader": "^0.25.0",
     "material-ui": "^0.16.1",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
@@ -32,6 +33,9 @@
     "redux-actions": "^0.12.0",
     "redux-observable": "^0.12.1",
     "rxjs": "^5.0.0-rc.1",
+    "style-loader": "^0.13.1",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^2.3.1",
     "ts-loader": "^0.9.5",
     "typescript": "^2.0.6",
     "webpack": "^1.13.3"
