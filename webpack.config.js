@@ -1,5 +1,7 @@
 module.exports = {
 
+  target: "electron",
+
   entry: {
     bundle: "./src/index.tsx",
     a: "./src/a.ts",

@@ -9,29 +9,43 @@ import 'rxjs/add/operator/mapTo'
 import 'rxjs/add/operator/filter'
 import 'rxjs/add/operator/delay'
 
+import { FlatButton, TextField } from "material-ui"
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import * as injectTapEventPlugin from 'react-tap-event-plugin';
+injectTapEventPlugin();
+
 class App extends React.Component<any, any> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      username: "",
+    }
+  }
   render() {
-    const { dispatch, isPinging } = this.props;
+    const { dispatch } = this.props;
     return (
       <div>
-        isPinging: {isPinging.toString()}
-        <button onClick={() => dispatch({type: "PING"})}>Ping</button>
-        <button onClick={() => dispatch({type: "PING2"})}>Ping2</button>
-        <button onClick={() => dispatch({type: "PING3"})}>Ping3</button>
+        <TextField
+          name="username"
+          floatingLabelText="username"
+          value={this.state.username}
+          onChange={(e: React.FormEvent<TextField>) => this.setState({username: (e.target as any).value})}
+          />
+        <FlatButton
+          label="sign up"
+          onClick={() => dispatch(createAction("SIGN-UP")(this.state.username))}
+          />
       </div>
     )
   }
 }
 
 const pingPong = handleActions({
-  "PING":  (state: any, action: Action<any>) => Object.assign({}, state, {isPinging: true}),
-  "PING2": (state: any, action: Action<any>) => Object.assign({}, state, {isPinging: true}),
-  "PING3": (state: any, action: Action<any>) => {
-    console.log("ignored", action);
+  "SIGN-UP":  (state: any, action: Action<any>) => {
+    console.log("reduce:", action);
     return state;
   },
-  "PONG":  (state: any, action: Action<any>) => Object.assign({}, state, {isPinging: false}),
-}, {isPinging: false} /* initial state */)
+}, {} /* initial state */)
 
 const pingEpic = (a: ActionsObservable<any>) => a.ofType('PING', 'PING2')
       .delay(1000) 
@@ -45,9 +59,10 @@ const store = createStore(pingPong, devtools, middlewares);
 const MyApp = connect((a: any) => a)(App);
 
 ReactDOM.render(
-  <Provider store={store}>
-    <MyApp />
-  </Provider>
+  <MuiThemeProvider>
+    <Provider store={store}>
+      <MyApp />
+    </Provider>
+  </MuiThemeProvider>
   , document.getElementById('main')
 );
-
