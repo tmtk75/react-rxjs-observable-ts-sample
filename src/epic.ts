@@ -108,4 +108,11 @@ function inviteUser(invitee: string): Promise<KiiGroup> {
     })
 }
 
-export const rootEpic = combineEpics(joinEpic, connectEpic, combineEpics(signUpEpic, signInEpic));
+export const rootEpic = combineEpics(
+  joinEpic,
+  connectEpic,
+  combineEpics(
+    signUpEpic,
+    signInEpic,
+  ),
+);
