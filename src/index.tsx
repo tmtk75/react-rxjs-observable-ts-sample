@@ -56,21 +56,24 @@ class App extends React.Component<any, any> {
 }
 
 const pingPong = handleActions({
-  "SIGN-UP":  (state: any, action: Action<any>) => {
-    return state;
+  "SIGN-UP.succeeded":  (state: any, action: Action<any>) => {
+    console.log(action);
+    return Object.assign({}, state, {user: action.payload});
   },
 }, {} /* initial state */)
 
-const pingEpic = (a: ActionsObservable<any>) => a.ofType('SIGN-UP')
-      .delay(1000) 
-      .map(x => {
-        return Rx.Observable.fromPromise(KiiUser.userWithUsername(x.payload.username, x.payload.password).register())
-      })
-      .mapTo({ type: 'PONG' })
+const signUpEpic = (a: ActionsObservable<any>) => a.ofType('SIGN-UP')
+      .map(x => Rx.Observable.fromPromise(
+        KiiUser.userWithUsername(x.payload.username, x.payload.password).register()))
+      .flatMap(x => x)
+      //.do(x => console.log("x:", x))
+      .map(payload => ({type: 'SIGN-UP.succeeded', payload}))
+
+const rootEpic = signUpEpic;
 
 const devtools = (window as any).devToolsExtension && (window as any).devToolsExtension()
 const middlewares = applyMiddleware(
-  createEpicMiddleware(pingEpic),
+  createEpicMiddleware(rootEpic),
 )
 const store = createStore(pingPong, devtools, middlewares);
 const MyApp = connect((a: any) => a)(App);
