@@ -18,8 +18,8 @@ class App extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
     this.state = {
-      username: "",
-      password: "",
+      username: "tmtk75",
+      password: "abc123",
     }
   }
   render() {
@@ -41,7 +41,10 @@ class App extends React.Component<any, any> {
           />
         <FlatButton
           label="sign up"
-          onClick={() => dispatch(createAction("SIGN-UP")(this.state.username))}
+          onClick={() => dispatch(createAction("SIGN-UP")({
+            username: this.state.username,
+            password: this.state.password,
+          }))}
           />
       </div>
     )
