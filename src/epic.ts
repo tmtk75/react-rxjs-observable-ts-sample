@@ -22,7 +22,7 @@ const signInEpic = (a: ActionsObservable<any>) => a.ofType('SIGN-IN')
       .flatMap(x => x)
       .map(payload => ({type: 'SIGN-IN.succeeded', payload}))
 
-function join(token: string): Promise<{user: KiiUser, group: KiiGroup}> {
+function join(token: string): Promise<{user: KiiUser, group: KiiGroup} | Error> {
   return Kii.serverCodeEntry("join").execute({token})
     .then(([a, b, r]) => r.getReturnedValue().returnedValue)
     .then(v => {
@@ -42,7 +42,7 @@ const joinEpic = (a: ActionsObservable<any>) => a.ofType('JOIN')
       .flatMap(x => x)
       .map(payload => ({type: 'JOIN.succeeded', payload}))
 
-function kiiPush(): Promise<{value: any} | {error: Error}> {
+function kiiPush(): Promise<any | Error> {
   const s = KiiUser.getCurrentUser().pushInstallation();
   return s.installMqtt(false)
     .then(({installationID}) => s.getMqttEndpoint(installationID))
@@ -63,7 +63,7 @@ function kiiTopic(group: KiiGroup, name: string): Promise<KiiTopic | Error> {
     })
 }
 
-function kiiWS(conf: any, store: Redux.Store<any>): any {
+function kiiWS(conf: any, store: Redux.Store<any>): Promise<Paho.MQTT.Client | Error> {
   const client = new Paho.MQTT.Client(conf.host, conf.portWS, conf.mqttTopic);
   client.onConnectionLost = (res) => store.dispatch({type: "CONNECTION-LOST", payload: res});
   client.onMessageArrived = (msg) => store.dispatch({type: "MESSAGE-ARRIVED", payload: JSON.parse(msg.payloadString)});
