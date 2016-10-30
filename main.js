@@ -4,6 +4,14 @@ const loadDevtool = require('electron-load-devtool');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 
+global.config = {
+  kiicloud: {
+    appID:  process.env["KII_APP_ID"],
+    appKey: process.env["KII_APP_KEY"],
+    apiEndpoint: process.env["KII_API_ENDPOINT"],
+  }
+};
+
 app.on('window-all-closed', () => {
   if (process.platform != 'darwin') {
     app.quit();
@@ -32,3 +40,4 @@ app.on('ready', () => {
 
 app.setPath("appData",  path.join(__dirname, "./.appData"));
 app.setPath("userData", path.join(__dirname, "./.userData"));
+

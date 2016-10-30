@@ -16,7 +16,9 @@ import * as injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 
 import { Kii, KiiUser } from "kii-sdk"
-Kii.initializeWithSite("2cdc6549", "3dbc623c48196a1d61ef039996a40519", "https://api-development-jp.internal.kii.com/api");
+import { remote } from 'electron'
+const { appID, appKey, apiEndpoint } = remote.getGlobal('config').kiicloud;
+Kii.initializeWithSite(appID, appKey, apiEndpoint);
 
 class App extends React.Component<any, any> {
   constructor(props: any) {
