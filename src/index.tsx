@@ -5,6 +5,7 @@ import { Provider, connect } from "react-redux"
 import { createAction, handleActions, Action } from "redux-actions"
 import { createEpicMiddleware, ActionsObservable } from 'redux-observable'
 import * as Rx from "rxjs"
+import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/mapTo'
 import 'rxjs/add/operator/filter'
 import 'rxjs/add/operator/delay'
@@ -13,6 +14,9 @@ import { FlatButton, TextField } from "material-ui"
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import * as injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
+
+import { Kii, KiiUser } from "kii-sdk"
+Kii.initializeWithSite("2cdc6549", "3dbc623c48196a1d61ef039996a40519", "https://api-development-jp.internal.kii.com/api");
 
 class App extends React.Component<any, any> {
   constructor(props: any) {
@@ -53,13 +57,15 @@ class App extends React.Component<any, any> {
 
 const pingPong = handleActions({
   "SIGN-UP":  (state: any, action: Action<any>) => {
-    console.log("reduce:", action);
     return state;
   },
 }, {} /* initial state */)
 
-const pingEpic = (a: ActionsObservable<any>) => a.ofType('PING', 'PING2')
+const pingEpic = (a: ActionsObservable<any>) => a.ofType('SIGN-UP')
       .delay(1000) 
+      .map(x => {
+        return Rx.Observable.fromPromise(KiiUser.userWithUsername(x.payload.username, x.payload.password).register())
+      })
       .mapTo({ type: 'PONG' })
 
 const devtools = (window as any).devToolsExtension && (window as any).devToolsExtension()

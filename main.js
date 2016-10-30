@@ -12,8 +12,8 @@ app.on('window-all-closed', () => {
 
 app.on('ready', () => {
   const win = new BrowserWindow({
-    width: 640,
-    height: 520,
+    width: 480,
+    height: 386,
     'node-integration': false,
     //transparent: true,
     //frame: false,

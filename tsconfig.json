@@ -12,5 +12,6 @@
     "removeComments": false
   },
   "files": [
+    "./assets/kii-sdk.d.ts"
   ]
 }

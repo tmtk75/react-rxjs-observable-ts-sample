@@ -12,6 +12,11 @@ module.exports = {
     filename: "[name].js"
   },
 
+  externals: [{
+    "kii-sdk": "__kii__",
+    "paho": "Paho",
+  }],
+
   resolve: {
     extensions: ["", ".js", ".ts", ".tsx"]
   },
