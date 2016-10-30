@@ -15,9 +15,9 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import * as injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 
-import { Kii, KiiUser } from "kii-sdk"
+import { Kii, KiiUser, KiiGroup } from "kii-sdk"
 import { remote } from 'electron'
-const { appID, appKey, apiEndpoint } = remote.getGlobal('config').kiicloud;
+const { kiicloud: { appID, appKey, apiEndpoint }, github: { token } } = remote.getGlobal('config');
 Kii.initializeWithSite(appID, appKey, apiEndpoint);
 
 class App extends React.Component<any, any> {
@@ -26,6 +26,7 @@ class App extends React.Component<any, any> {
     this.state = {
       username: "tmtk75",
       password: "abc123",
+      github_token: token,
     }
   }
   render() {
@@ -59,6 +60,18 @@ class App extends React.Component<any, any> {
             password: this.state.password,
           }))}
           />
+        <TextField
+          name="github_token"
+          floatingLabelText="github_token"
+          value={this.state.github_token}
+          onChange={(e: React.FormEvent<TextField>) => this.setState({github_token: (e.target as any).value})}
+          />
+        <FlatButton
+          label="join"
+          onClick={() => dispatch(createAction("JOIN")({
+            github_token: this.state.github_token,
+          }))}
+          />
       </div>
     )
   }
@@ -66,12 +79,13 @@ class App extends React.Component<any, any> {
 
 const pingPong = handleActions({
   "SIGN-UP.succeeded":  (state: any, action: Action<any>) => {
-    console.log(action);
     return Object.assign({}, state, {user: action.payload});
   },
   "SIGN-IN.succeeded":  (state: any, action: Action<any>) => {
-    console.log(action);
     return Object.assign({}, state, {user: action.payload});
+  },
+  "JOIN.succeeded":  (state: any, action: Action<any>) => {
+    return Object.assign({}, state, action.payload);
   },
 }, {} /* initial state */)
 
@@ -79,7 +93,6 @@ const signUpEpic = (a: ActionsObservable<any>) => a.ofType('SIGN-UP')
       .map(x => Rx.Observable.fromPromise(
         KiiUser.userWithUsername(x.payload.username, x.payload.password).register()))
       .flatMap(x => x)
-      //.do(x => console.log("x:", x))
       .map(payload => ({type: 'SIGN-UP.succeeded', payload}))
 
 const signInEpic = (a: ActionsObservable<any>) => a.ofType('SIGN-IN')
@@ -87,11 +100,31 @@ const signInEpic = (a: ActionsObservable<any>) => a.ofType('SIGN-IN')
         KiiUser.authenticate(x.payload.username, x.payload.password)
       ))
       .flatMap(x => x)
-      //.do(x => console.log("x:", x))
       .map(payload => ({type: 'SIGN-IN.succeeded', payload}))
 
-const rootEpic = combineEpics(signUpEpic, signInEpic);
+function join(token: string): Promise<{user: KiiUser, group: KiiGroup}> {
+  return Kii.serverCodeEntry("join").execute({token})
+    .then(([a, b, r]) => r.getReturnedValue().returnedValue)
+    .then(v => {
+      if (v.error)
+        throw new Error(v.error)
+      return v
+    })
+    .then(({login, groups: [g]}) => Promise.all([
+      KiiUser.findUserByUsername(login),
+      KiiGroup.groupWithID(g).refresh(),
+    ]))
+    .then(([user, group]) => ({user, group}))
+}
 
+const joinEpic = (a: ActionsObservable<any>) => a.ofType('JOIN')
+      .map(x => Rx.Observable.fromPromise(join(x.payload.github_token)))
+      .flatMap(x => x)
+      .map(payload => ({type: 'JOIN.succeeded', payload}))
+
+const rootEpic = combineEpics(joinEpic, combineEpics(signUpEpic, signInEpic));
+
+//
 const devtools = (window as any).devToolsExtension && (window as any).devToolsExtension()
 const middlewares = applyMiddleware(
   createEpicMiddleware(rootEpic),

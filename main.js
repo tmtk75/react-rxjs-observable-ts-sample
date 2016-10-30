@@ -5,6 +5,9 @@ const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 
 global.config = {
+  github: {
+    token: process.env["GITHUB_TOKEN"],
+  },
   kiicloud: {
     appID:  process.env["KII_APP_ID"],
     appKey: process.env["KII_APP_KEY"],

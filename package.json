@@ -7,6 +7,9 @@
     "start": "electron .",
     "build": "webpack --progress --colors",
     "build:watch": "webpack --watch --progress --colors",
+	  "kii:build": "webpack --progress --colors --config ./src/kiicloud/webpack.config.js",
+    "kii:deploy": "kii-cli servercode deploy dist/kii-servercode.js",
+    "kii:build-deploy": "npm run kii:build; npm run kii:deploy",
     "distclean": "rm -rf dist"
   },
   "devDependencies": {
