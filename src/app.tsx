@@ -54,6 +54,10 @@ export default class App extends React.Component<any, any> {
             github_token: this.state.github_token,
           }))}
           />
+        <FlatButton
+          label="connect"
+          onClick={() => dispatch(createAction("CONNECT")())}
+          />
         <hr />
         <div>
           <div>user: {user ? user.getUsername() : null}</div>

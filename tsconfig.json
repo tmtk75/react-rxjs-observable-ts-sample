@@ -12,6 +12,7 @@
     "removeComments": false
   },
   "files": [
-    "./assets/kii-sdk.d.ts"
+    "./assets/kii-sdk.d.ts",
+    "./assets/paho.d.ts"
   ]
 }
