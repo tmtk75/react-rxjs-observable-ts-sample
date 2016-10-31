@@ -16,15 +16,9 @@ const genEpic = (type: string, genPromise: (x: any) => Promise<any>) =>
       }))))
     .map((payload: any) => (payload.error ? payload : {type: `${type}.succeeded`, payload}))
 
-const signUpEpic = genEpic("SIGN-UP",
-  (x) => KiiUser.userWithUsername(x.payload.username, x.payload.password).register()
-)
+const signUpEpic = genEpic("SIGN-UP", (x) => KiiUser.userWithUsername(x.payload.username, x.payload.password).register())
 
-const signInEpic = (a: ActionsObservable<any>) => a.ofType('SIGN-IN')
-      .mergeMap(x => Rx.Observable.fromPromise(
-        KiiUser.authenticate(x.payload.username, x.payload.password)
-      ))
-      .map(payload => ({type: 'SIGN-IN.succeeded', payload}))
+const signInEpic = genEpic("SIGN-IN", (x) => KiiUser.authenticate(x.payload.username, x.payload.password))
 
 function join(token: string): Promise<{user: KiiUser, group: KiiGroup} | Error> {
   return Kii.serverCodeEntry("join").execute({token})
