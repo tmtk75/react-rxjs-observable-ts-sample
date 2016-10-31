@@ -1,7 +1,8 @@
+import * as Rx from "rxjs"
 import { Observable } from "rxjs"
 
-const a = Observable.range(1, 10)
-const b = Observable.range(1, 5).map(x => x * 2)
+const a = Observable.of(1, 3, 5)
+const b = Observable.of(10, 10, 10)
 
 //a.zip(b) .subscribe(console.log)
 
@@ -12,13 +13,12 @@ const x = Observable.interval(2000).timeInterval().zip(a.map(x => x.toString()))
 const y = Observable.interval(1000).timeInterval().zip(b.map(x => x.toString()))
 //x.concat(y).subscribe(console.log)
 
+a.mergeMap(x => Observable.of(10, 10, 10), (a, b) => a*b)
+  //.subscribe(console.log);
 
-
-
-const yahoo  = Observable.fromPromise(Promise.resolve("www.yahoo.co.jp"));
-const google = Observable.fromPromise(Promise.resolve("www.google.co.jp"));
-
-Observable.from([yahoo, google])
-  .flatMap(x => x)
-  .subscribe(console.log);
+var letters = Rx.Observable.of('a', 'b', 'c');
+var result = letters.mergeMap(x =>
+      Rx.Observable.interval(1000).map(i => x + i)
+    )
+    .subscribe(console.log);
 

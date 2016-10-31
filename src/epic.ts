@@ -8,8 +8,15 @@ import {
 
 const signUpEpic = (a: ActionsObservable<any>) => a.ofType('SIGN-UP')
       .mergeMap(x => Rx.Observable.fromPromise(
-        KiiUser.userWithUsername(x.payload.username, x.payload.password).register()))
-      .map(payload => ({type: 'SIGN-UP.succeeded', payload}))
+        KiiUser.userWithUsername(x.payload.username, x.payload.password)
+          .register()
+          .catch(err => ({ 
+            type: "SIGN-UP.rejected",
+            payload: err,
+            error: true,
+          }))
+      ))
+      .map((payload: any) => (payload.error ? payload : {type: 'SIGN-UP.succeeded', payload}))
 
 const signInEpic = (a: ActionsObservable<any>) => a.ofType('SIGN-IN')
       .mergeMap(x => Rx.Observable.fromPromise(
