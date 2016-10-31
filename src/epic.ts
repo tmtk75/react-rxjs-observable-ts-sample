@@ -28,7 +28,7 @@ const signInEpic = epicFromPromise("SIGN-IN", (x) =>
     .then(([user, groups]) => ({user, groups}))
 )
 
-function join(token: string): Promise<{user: KiiUser, group: KiiGroup} | Error> {
+function join(token: string): Promise<{user: KiiUser, group: KiiGroup}> {
   return Kii.serverCodeEntry("join").execute({token})
     .then(([a, b, r]) => r.getReturnedValue().returnedValue)
     .then(v => {
@@ -45,13 +45,13 @@ function join(token: string): Promise<{user: KiiUser, group: KiiGroup} | Error> 
 
 const joinEpic = epicFromPromise('JOIN', (x) => join(x.payload.github_token))
 
-function kiiPush(): Promise<any | Error> {
+function kiiPush(): Promise<any> {
   const s = KiiUser.getCurrentUser().pushInstallation();
   return s.installMqtt(false)
     .then(({installationID}) => s.getMqttEndpoint(installationID))
 }
 
-function kiiTopic(group: KiiGroup, name: string): Promise<KiiTopic | Error> {
+function kiiTopic(group: KiiGroup, name: string): Promise<KiiTopic> {
   return group.listTopics()
     .then(([[topic], _]) => topic ? topic : group.topicWithName(name).save())
     .then(topic => KiiUser.getCurrentUser().pushSubscription().isSubscribed(topic))
@@ -66,7 +66,7 @@ function kiiTopic(group: KiiGroup, name: string): Promise<KiiTopic | Error> {
     })
 }
 
-function kiiWS(conf: any, store: Redux.Store<any>): Promise<Paho.MQTT.Client | Error> {
+function kiiWS(conf: any, store: Redux.Store<any>): Promise<Paho.MQTT.Client> {
   const client = new Paho.MQTT.Client(conf.host, conf.portWS, conf.mqttTopic);
   client.onConnectionLost = (res) => store.dispatch({type: "CONNECTION-LOST", payload: res});
   client.onMessageArrived = (msg) => store.dispatch({type: "MESSAGE-ARRIVED", payload: JSON.parse(msg.payloadString)});

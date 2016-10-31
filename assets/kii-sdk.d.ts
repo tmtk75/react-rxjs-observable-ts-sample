@@ -11,8 +11,8 @@ declare module "kii-sdk" {
 
   export class KiiGroup {
     static groupWithID(id: string): KiiGroup;
-    static registerGroupWithID(id: string, name: string, opts: any): Promise<KiiGroup | Error>;
-    refresh(): Promise<KiiGroup | Error>;
+    static registerGroupWithID(id: string, name: string, opts: any): Promise<KiiGroup>;
+    refresh(): Promise<KiiGroup>;
     getName(): string;
     listTopics(): Promise<any>;
     topicWithName(name: string): KiiTopic;
@@ -23,12 +23,12 @@ declare module "kii-sdk" {
 
   export class KiiUser {
     static userWithUsername(username: string, password: string): KiiUser;
-    static authenticateWithToken(token: string): Promise<KiiUser | Error>;
+    static authenticateWithToken(token: string): Promise<KiiUser>;
     static getCurrentUser(): KiiUser;
-    static findUserByUsername(username: string): Promise<KiiUser | Error>;
+    static findUserByUsername(username: string): Promise<KiiUser>;
     static authenticate(username: string, password: string): Promise<KiiUser>;
-    register(): Promise<KiiUser | Error>;
-    refresh(): Promise<KiiUser | Error>;
+    register(): Promise<KiiUser>;
+    refresh(): Promise<KiiUser>;
     get(name: string): any;
     getUUID(): string;
     getAccessToken(): string;
