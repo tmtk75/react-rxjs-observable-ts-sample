@@ -1,3 +1,4 @@
+import { Action } from "redux-actions"
 import * as Rx from "rxjs"
 import 'rxjs/add/operator/map'
 import { combineEpics, ActionsObservable } from 'redux-observable'
@@ -6,19 +7,25 @@ import {
   Kii, KiiUser, KiiGroup, KiiTopic, KiiPushMessageBuilder,
 } from "kii-sdk"
 
-const epicFromPromise = (type: string, genPromise: (x: any) => Promise<any>) =>
-  (a: ActionsObservable<any>) => a.ofType(type)
-    .mergeMap(x => Rx.Observable.fromPromise(genPromise(x)
+type GenPromise = (x: Action<any>, s: Redux.Store<any>) => Promise<any>
+
+const epicFromPromise = (type: string, genPromise: GenPromise) =>
+  (a: ActionsObservable<any>, store: Redux.Store<any>) => a.ofType(type)
+    .mergeMap(action => Rx.Observable.fromPromise(genPromise(action, store)
       .catch(err => ({
         type: `${type}.rejected`,
         payload: err,
         error: true,
       }))))
-    .map((payload: any) => (payload.error ? payload : {type: `${type}.succeeded`, payload}))
+    .map((payload: any) => (payload.error ? payload : {type: `${type}.resolved`, payload}))
 
 const signUpEpic = epicFromPromise("SIGN-UP", (x) => KiiUser.userWithUsername(x.payload.username, x.payload.password).register())
 
-const signInEpic = epicFromPromise("SIGN-IN", (x) => KiiUser.authenticate(x.payload.username, x.payload.password))
+const signInEpic = epicFromPromise("SIGN-IN", (x) =>
+  KiiUser.authenticate(x.payload.username, x.payload.password)
+    .then(u => u.memberOfGroups())
+    .then(([user, groups]) => ({user, groups}))
+)
 
 function join(token: string): Promise<{user: KiiUser, group: KiiGroup} | Error> {
   return Kii.serverCodeEntry("join").execute({token})
@@ -35,9 +42,7 @@ function join(token: string): Promise<{user: KiiUser, group: KiiGroup} | Error> 
     .then(([user, group]) => ({user, group}))
 }
 
-const joinEpic = (a: ActionsObservable<any>) => a.ofType('JOIN')
-      .mergeMap(x => Rx.Observable.fromPromise(join(x.payload.github_token)))
-      .map(payload => ({type: 'JOIN.succeeded', payload}))
+const joinEpic = epicFromPromise('JOIN', (x) => join(x.payload.github_token))
 
 function kiiPush(): Promise<any | Error> {
   const s = KiiUser.getCurrentUser().pushInstallation();
@@ -71,7 +76,7 @@ function kiiWS(conf: any, store: Redux.Store<any>): Promise<Paho.MQTT.Client | E
       onSuccess: () => {
         client.subscribe(conf.mqttTopic);
         resolve(client);
-        store.dispatch({type: "CONNECTION-ALIVE"});
+        store.dispatch({type: "CONNECTION-ALIVE", payload: client});
       },
       onFailure: (err: Error) => reject(err),
     });
@@ -84,15 +89,11 @@ function kiiSend(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Promise<
   return topic.sendMessage(msg)
 }
 
-const connectEpic = (a: ActionsObservable<any>, store: any) => a.ofType('CONNECT')
-      .mergeMap(action => Rx.Observable.fromPromise(
+const connectEpic = epicFromPromise("CONNECT", (action, store) => 
         kiiPush().then(conf =>
           kiiTopic(action.payload, "status")
             .then(topic => kiiWS(conf, store)
-              .then(_ => kiiSend(topic as KiiTopic)))
-        )
-      ))
-      .map(payload => ({type: 'CONNECT.succeeded', payload}))
+              .then(_ => kiiSend(topic as KiiTopic)))))
 
 function inviteUser(invitee: string): Promise<KiiGroup> {
   return KiiUser.findUserByUsername(invitee)

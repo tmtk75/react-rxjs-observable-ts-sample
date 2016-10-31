@@ -26,7 +26,7 @@ declare module "kii-sdk" {
     static authenticateWithToken(token: string): Promise<KiiUser | Error>;
     static getCurrentUser(): KiiUser;
     static findUserByUsername(username: string): Promise<KiiUser | Error>;
-    static authenticate(username: string, password: string): Promise<KiiUser | Error>;
+    static authenticate(username: string, password: string): Promise<KiiUser>;
     register(): Promise<KiiUser | Error>;
     refresh(): Promise<KiiUser | Error>;
     get(name: string): any;
@@ -35,6 +35,7 @@ declare module "kii-sdk" {
     getUsername(): string;
     pushInstallation(): KiiPushSubscription;
     pushSubscription(): KiiPushSubscription;
+    memberOfGroups(): Promise<any>;
   }
 
   export class KiiTopic {
