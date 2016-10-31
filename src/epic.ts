@@ -7,9 +7,9 @@ import {
   Kii, KiiUser, KiiGroup, KiiTopic, KiiPushMessageBuilder,
 } from "kii-sdk"
 
-type GenPromise = (x: Action<any>, s: Redux.Store<any>) => Promise<any>
+type ToPromise = (x: Action<any>, s: Redux.Store<any>) => Promise<any>
 
-const epicFromPromise = (type: string, genPromise: GenPromise) =>
+const epicFromPromise = (type: string, genPromise: ToPromise) =>
   (a: ActionsObservable<any>, store: Redux.Store<any>) => a.ofType(type)
     .mergeMap(action => Rx.Observable.fromPromise(genPromise(action, store)
       .catch(err => ({
@@ -19,7 +19,8 @@ const epicFromPromise = (type: string, genPromise: GenPromise) =>
       }))))
     .map((payload: any) => (payload.error ? payload : {type: `${type}.resolved`, payload}))
 
-const signUpEpic = epicFromPromise("SIGN-UP", (x) => KiiUser.userWithUsername(x.payload.username, x.payload.password).register())
+const signUpEpic = epicFromPromise("SIGN-UP", (x) =>
+  KiiUser.userWithUsername(x.payload.username, x.payload.password).register())
 
 const signInEpic = epicFromPromise("SIGN-IN", (x) =>
   KiiUser.authenticate(x.payload.username, x.payload.password)
