@@ -6,17 +6,19 @@ import {
   Kii, KiiUser, KiiGroup, KiiTopic, KiiPushMessageBuilder,
 } from "kii-sdk"
 
-const signUpEpic = (a: ActionsObservable<any>) => a.ofType('SIGN-UP')
-      .mergeMap(x => Rx.Observable.fromPromise(
-        KiiUser.userWithUsername(x.payload.username, x.payload.password)
-          .register()
-          .catch(err => ({ 
-            type: "SIGN-UP.rejected",
-            payload: err,
-            error: true,
-          }))
-      ))
-      .map((payload: any) => (payload.error ? payload : {type: 'SIGN-UP.succeeded', payload}))
+const genEpic = (type: string, genPromise: (x: any) => Promise<any>) =>
+  (a: ActionsObservable<any>) => a.ofType(type)
+    .mergeMap(x => Rx.Observable.fromPromise(genPromise(x)
+      .catch(err => ({
+        type: `${type}.rejected`,
+        payload: err,
+        error: true,
+      }))))
+    .map((payload: any) => (payload.error ? payload : {type: `${type}.succeeded`, payload}))
+
+const signUpEpic = genEpic("SIGN-UP",
+  (x) => KiiUser.userWithUsername(x.payload.username, x.payload.password).register()
+)
 
 const signInEpic = (a: ActionsObservable<any>) => a.ofType('SIGN-IN')
       .mergeMap(x => Rx.Observable.fromPromise(
