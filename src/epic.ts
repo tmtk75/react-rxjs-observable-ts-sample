@@ -6,7 +6,7 @@ import {
   Kii, KiiUser, KiiGroup, KiiTopic, KiiPushMessageBuilder,
 } from "kii-sdk"
 
-const genEpic = (type: string, genPromise: (x: any) => Promise<any>) =>
+const epicFromPromise = (type: string, genPromise: (x: any) => Promise<any>) =>
   (a: ActionsObservable<any>) => a.ofType(type)
     .mergeMap(x => Rx.Observable.fromPromise(genPromise(x)
       .catch(err => ({
@@ -16,9 +16,9 @@ const genEpic = (type: string, genPromise: (x: any) => Promise<any>) =>
       }))))
     .map((payload: any) => (payload.error ? payload : {type: `${type}.succeeded`, payload}))
 
-const signUpEpic = genEpic("SIGN-UP", (x) => KiiUser.userWithUsername(x.payload.username, x.payload.password).register())
+const signUpEpic = epicFromPromise("SIGN-UP", (x) => KiiUser.userWithUsername(x.payload.username, x.payload.password).register())
 
-const signInEpic = genEpic("SIGN-IN", (x) => KiiUser.authenticate(x.payload.username, x.payload.password))
+const signInEpic = epicFromPromise("SIGN-IN", (x) => KiiUser.authenticate(x.payload.username, x.payload.password))
 
 function join(token: string): Promise<{user: KiiUser, group: KiiGroup} | Error> {
   return Kii.serverCodeEntry("join").execute({token})
