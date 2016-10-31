@@ -1,6 +1,9 @@
 import * as React from "react"
 import { createAction } from "redux-actions"
 import { FlatButton, TextField } from "material-ui"
+import {
+  disconnect,
+} from "./action"
 
 export default class App extends React.Component<any, any> {
   constructor(props: any) {
@@ -12,7 +15,7 @@ export default class App extends React.Component<any, any> {
     }
   }
   render() {
-    const { dispatch, kiicloud: { user, group }, message: { value } } = this.props;
+    const { dispatch, kiicloud: { profile: { user, group } }, message: { value } } = this.props;
     return (
       <div>
         <TextField
@@ -57,6 +60,10 @@ export default class App extends React.Component<any, any> {
         <FlatButton
           label="connect"
           onClick={() => dispatch(createAction("CONNECT")(group))}
+          />
+        <FlatButton
+          label="disconnect"
+          onClick={() => dispatch(disconnect(this.props))}
           />
         <hr />
         <div>

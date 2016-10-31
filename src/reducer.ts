@@ -1,7 +1,7 @@
 import { handleActions, Action } from "redux-actions"
 import { combineReducers } from "redux"
 
-const kiicloud = handleActions({
+const profile = handleActions({
   "SIGN-UP.resolved": (state: any, action: Action<any>) => {
     return Object.assign({}, state, {user: action.payload});
   },
@@ -18,8 +18,9 @@ const kiicloud = handleActions({
   },
 }, {} /* initial state */)
 
-const mqttConection = handleActions({
+const mqttConnection = handleActions({
   "CONNECTION-ALIVE": (state: any, action: Action<any>) => {
+    console.log(action);
     return Object.assign({}, state, action.payload);
   },
 }, {} /* initial state */)
@@ -31,8 +32,10 @@ const message = handleActions({
 }, {} /* initial state */)
 
 export const reducer = combineReducers({
-  kiicloud,
+  kiicloud: combineReducers({
+    profile,
+    mqttConnection,
+  }),
   message,
-  mqttConection,
 })
 

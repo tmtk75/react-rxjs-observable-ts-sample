@@ -77,7 +77,10 @@ function kiiWS(conf: any, store: Redux.Store<any>): Promise<Paho.MQTT.Client> {
       onSuccess: () => {
         client.subscribe(conf.mqttTopic);
         resolve(client);
-        store.dispatch({type: "CONNECTION-ALIVE", payload: client});
+        store.dispatch({type: "CONNECTION-ALIVE", payload: {
+          pushInstallation: conf,
+          mqttClient: client,
+        }});
       },
       onFailure: (err: Error) => reject(err),
     });
@@ -94,7 +97,7 @@ const connectEpic = epicFromPromise("CONNECT", (action, store) =>
         kiiPush().then(conf =>
           kiiTopic(action.payload, "status")
             .then(topic => kiiWS(conf, store)
-              .then(_ => kiiSend(topic as KiiTopic)))))
+              .then(_ => kiiSend(topic)))))
 
 function inviteUser(invitee: string): Promise<KiiGroup> {
   return KiiUser.findUserByUsername(invitee)
