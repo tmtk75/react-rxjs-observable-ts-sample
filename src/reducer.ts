@@ -10,6 +10,7 @@ const kiicloud = handleActions({
     return Object.assign({}, state, {
       user,
       group: groups ? groups[0] : null,
+      groups,
     });
   },
   "JOIN.resolved": (state: any, action: Action<any>) => {
