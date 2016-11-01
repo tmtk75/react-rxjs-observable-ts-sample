@@ -1,8 +1,7 @@
-const path = require("path");
-const electron = require('electron');
+const path        = require("path");
+const electron    = require('electron');
+const app         = electron.app;
 const loadDevtool = require('electron-load-devtool');
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
 
 global.config = {
   github: {
@@ -22,7 +21,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('ready', () => {
-  const win = new BrowserWindow({
+  const win = new electron.BrowserWindow({
     width: 480,
     height: 386,
     'node-integration': false,

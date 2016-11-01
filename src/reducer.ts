@@ -30,11 +30,19 @@ const message = handleActions({
   },
 }, {} /* initial state */)
 
+const rejected = (state: any = {}, action: Action<any>) => {
+  if (action.type.match(/\.rejected$/)) {
+    console.error(action.type, action.payload);
+  }
+  return state;
+}
+
 export const reducer = combineReducers({
   kiicloud: combineReducers({
     profile,
     mqtt,
   }),
   message,
+  rejected,
 })
 

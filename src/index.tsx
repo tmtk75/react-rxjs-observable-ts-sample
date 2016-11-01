@@ -28,7 +28,7 @@ const MyApp = connect((a: any) => a)(App);
 ReactDOM.render(
   <MuiThemeProvider>
     <Provider store={store}>
-      <MyApp {...{token}} />
+      <MyApp {...{github_token: token}} />
     </Provider>
   </MuiThemeProvider>
   , document.getElementById('main')

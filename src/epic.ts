@@ -99,6 +99,17 @@ const connectEpic = epicFromPromise("CONNECT", (action, store) =>
             .then(topic => kiiWS(conf, store)
               .then(_ => kiiSend(topic)))))
 
+import { startReconnecting } from "./action"
+const connectionLostEpic = (a: ActionsObservable<any>, store: Redux.Store<any>) =>
+        a.ofType("CONNECTION-LOST")
+         .mapTo(startReconnecting(0))
+
+const startReconnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<any>) =>
+        a.ofType("START-RECONNECTING")
+         .map(x => {
+           return {type: "CONNECT", payload: store.getState().kiicloud.profile.group}
+         })
+
 function inviteUser(invitee: string): Promise<KiiGroup> {
   return KiiUser.findUserByUsername(invitee)
     .then(user => [user, KiiGroup.groupWithID("kiicorp")])
@@ -115,5 +126,9 @@ export const rootEpic = combineEpics(
   combineEpics(
     signUpEpic,
     signInEpic,
+  ),
+  combineEpics(
+    connectionLostEpic,
+    startReconnectingEpic,
   ),
 );

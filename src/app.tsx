@@ -1,21 +1,34 @@
 import * as React from "react"
+import { Dispatch } from "redux"
 import { createAction } from "redux-actions"
 import { FlatButton, TextField } from "material-ui"
 import {
   disconnect,
 } from "./action"
 
-export default class App extends React.Component<any, any> {
+type AppProps = {
+  dispatch: Dispatch<any>,
+  kiicloud: KiiCloudState,
+  message: any,
+}
+
+type AppState = {
+  username: string,
+  password: string,
+  github_token: string,
+}
+
+export default class App extends React.Component<AppProps, any> {
   constructor(props: any) {
     super(props);
     this.state = {
       username: "tmtk75",
       password: "abc123",
-      github_token: props.token,
+      github_token: props.github_token,
     }
   }
   render() {
-    const { dispatch, kiicloud: { profile: { user, group } }, message: { value } } = this.props;
+    const { dispatch, kiicloud: { profile: { user, group }, mqtt: { client } }, message: { value } } = this.props;
     return (
       <div>
         <TextField
@@ -33,6 +46,7 @@ export default class App extends React.Component<any, any> {
           />
         <FlatButton
           label="sign up"
+          disabled={!!user}
           onClick={() => dispatch(createAction("SIGN-UP")({
             username: this.state.username,
             password: this.state.password,
@@ -40,6 +54,7 @@ export default class App extends React.Component<any, any> {
           />
         <FlatButton
           label="sign in"
+          disabled={!!user}
           onClick={() => dispatch(createAction("SIGN-IN")({
             username: this.state.username,
             password: this.state.password,
@@ -53,15 +68,18 @@ export default class App extends React.Component<any, any> {
           />
         <FlatButton
           label="join"
+          disabled={!user}
           onClick={() => dispatch(createAction("JOIN")({
             github_token: this.state.github_token,
           }))}
           />
         <FlatButton
           label="connect"
+          disabled={!!client || !user}
           onClick={() => dispatch(createAction("CONNECT")(group))}
           />
         <FlatButton
+          disabled={!client}
           label="disconnect"
           onClick={() => dispatch(disconnect(this.props.kiicloud))}
           />
