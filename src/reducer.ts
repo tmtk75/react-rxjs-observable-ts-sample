@@ -18,9 +18,8 @@ const profile = handleActions({
   },
 }, {} /* initial state */)
 
-const mqttConnection = handleActions({
+const mqtt = handleActions({
   "CONNECTION-ALIVE": (state: any, action: Action<any>) => {
-    console.log(action);
     return Object.assign({}, state, action.payload);
   },
 }, {} /* initial state */)
@@ -34,7 +33,7 @@ const message = handleActions({
 export const reducer = combineReducers({
   kiicloud: combineReducers({
     profile,
-    mqttConnection,
+    mqtt,
   }),
   message,
 })

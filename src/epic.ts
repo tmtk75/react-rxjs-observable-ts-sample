@@ -78,8 +78,8 @@ function kiiWS(conf: any, store: Redux.Store<any>): Promise<Paho.MQTT.Client> {
         client.subscribe(conf.mqttTopic);
         resolve(client);
         store.dispatch({type: "CONNECTION-ALIVE", payload: {
-          pushInstallation: conf,
-          mqttClient: client,
+          pushSubscription: conf,
+          client,
         }});
       },
       onFailure: (err: Error) => reject(err),

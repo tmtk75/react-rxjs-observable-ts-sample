@@ -13,6 +13,7 @@ declare module "paho" {
       connect(args: connArgs): void;
       onConnectionLost: (a: any) => void;
       onMessageArrived: (a: any) => void;
+      disconnect(): void;
     }
   }
 }

@@ -63,7 +63,7 @@ export default class App extends React.Component<any, any> {
           />
         <FlatButton
           label="disconnect"
-          onClick={() => dispatch(disconnect(this.props))}
+          onClick={() => dispatch(disconnect(this.props.kiicloud))}
           />
         <hr />
         <div>
