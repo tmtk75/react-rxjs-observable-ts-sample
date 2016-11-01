@@ -107,6 +107,7 @@ const connectionLostEpic = (a: ActionsObservable<any>, store: Redux.Store<any>) 
 const startReconnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<any>) =>
         a.ofType("START-RECONNECTING")
          .map(x => {
+           //TODO: something wrong because of to cause repetition
            return {type: "CONNECT", payload: store.getState().kiicloud.profile.group}
          })
 
