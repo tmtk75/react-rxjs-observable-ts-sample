@@ -12,6 +12,7 @@ declare global {
       mqtt: {
         pushSubscription: KiiPushSubscription,
         client: Paho.MQTT.Client,
+        retryCount: number,
       },
   }
 

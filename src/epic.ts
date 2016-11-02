@@ -95,7 +95,7 @@ function kiiSend(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Promise<
 
 const connectEpic = epicFromPromise("CONNECT", (action, store) => 
         kiiPush().then(conf =>
-          kiiTopic(action.payload.group, "status")
+          kiiTopic(action.payload, "status")
             .then(topic => kiiWS(conf, store)
               .then(_ => kiiSend(topic)))))
 
@@ -104,11 +104,20 @@ const connectionLostEpic = (a: ActionsObservable<any>, store: Redux.Store<any>) 
         a.ofType("CONNECTION-LOST")
          .mapTo(startReconnecting(0))
 
+import { connect } from "./action"
 const startReconnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<any>) =>
         a.ofType("START-RECONNECTING")
-         .map(x => {
-           //TODO: something wrong because of to cause repetition
-           return {type: "CONNECT", payload: store.getState().kiicloud.profile.group}
+         .mapTo(connect(store.getState().kiicloud.profile.group))
+
+const retryConnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
+        a.ofType("CONNECT.rejected")
+         .delay(1000 * store.getState().kiicloud.mqtt.retryCount)
+         .mapTo({
+           type: "RETRY-CONNECTING",
+           payload: {
+             group: store.getState().kiicloud.profile.group,
+             retry: 3,
+           },
          })
 
 function inviteUser(invitee: string): Promise<KiiGroup> {
@@ -131,5 +140,6 @@ export const rootEpic = combineEpics(
   combineEpics(
     connectionLostEpic,
     startReconnectingEpic,
+    retryConnectingEpic,
   ),
 );

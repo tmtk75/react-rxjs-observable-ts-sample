@@ -3,6 +3,7 @@ import { Dispatch } from "redux"
 import { createAction } from "redux-actions"
 import { FlatButton, TextField } from "material-ui"
 import {
+  connect,
   disconnect,
 } from "./action"
 
@@ -76,7 +77,7 @@ export default class App extends React.Component<AppProps, any> {
         <FlatButton
           label="connect"
           disabled={!!client || !user}
-          onClick={() => dispatch(createAction("CONNECT")({group}))}
+          onClick={() => dispatch(connect(group))}
           />
         <FlatButton
           disabled={!client}
