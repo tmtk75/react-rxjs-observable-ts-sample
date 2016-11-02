@@ -15,8 +15,12 @@ const f: any = () => {
     .debounceTime(100);
 }
 
+const ENTER = {};
+
 Rx.Observable.fromEvent(document, 'keypress')
   .filter((e: any) => e.target.tagName !== 'INPUT')
+  .filter(e => e.charCode || e.keyCode === 13)
+  .map((e) => e.keyCode === 13 ? ENTER : String.fromCharCode(e.charCode))
   .bufferWhen(f)
   .subscribe((events: any) => {
     console.log(events);
