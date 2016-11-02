@@ -18,7 +18,7 @@ Rx.Observable.fromEvent(document, 'keypress')
   .map((e) => e.keyCode === 13 ? ENTER : String.fromCharCode(e.charCode))
   .buffer(
     Rx.Observable.fromEvent(document, 'keypress')
-    .debounceTime(100)
+    .debounceTime(500)
   )
   //.filter((chars) => chars && chars.length > 1 && ( chars[chars.length - 1] === ENTER))
   .map((chars) => chars.slice(0, -1).join(''))
