@@ -1,24 +1,23 @@
 import * as Rx from "rxjs"
 import { Observable } from "rxjs"
+import 'rxjs/add/operator/debounce'
+/*
+import { Kii, KiiUser } from "kii-sdk"
 
-const a = Observable.of(1, 3, 5)
-const b = Observable.of(10, 10, 10)
+Kii.initializeWithSite("2cdc6549", "3dbc623c48196a1d61ef039996a40519", "https://api-development-jp.internal.kii.com/api")
 
-//a.zip(b) .subscribe(console.log)
+Observable.fromPromise(KiiUser.authenticate("tmtk75", "abc123"))
+  .subscribe(console.log)
+*/
 
-Observable.combineLatest(a, b, (a: any, b: any) => [a, b])
- //.subscribe(console.log)
+const f: any = () => {
+  return Rx.Observable.fromEvent(document, 'keypress')
+    .debounceTime(100);
+}
 
-const x = Observable.interval(2000).timeInterval().zip(a.map(x => x.toString()))
-const y = Observable.interval(1000).timeInterval().zip(b.map(x => x.toString()))
-//x.concat(y).subscribe(console.log)
-
-a.mergeMap(x => Observable.of(10, 10, 10), (a, b) => a*b)
-  //.subscribe(console.log);
-
-var letters = Rx.Observable.of('a', 'b', 'c');
-var result = letters.mergeMap(x =>
-      Rx.Observable.interval(1000).map(i => x + i)
-    )
-    .subscribe(console.log);
-
+Rx.Observable.fromEvent(document, 'keypress')
+  .filter((e: any) => e.target.tagName !== 'INPUT')
+  .bufferWhen(f)
+  .subscribe((events: any) => {
+    console.log(events);
+  });
