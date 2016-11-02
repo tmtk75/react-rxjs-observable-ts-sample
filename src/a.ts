@@ -22,6 +22,8 @@ Rx.Observable.fromEvent(document, 'keypress')
   .filter(e => e.charCode || e.keyCode === 13)
   .map((e) => e.keyCode === 13 ? ENTER : String.fromCharCode(e.charCode))
   .bufferWhen(f)
+  //.filter((chars) => chars && chars.length > 1 && ( chars[chars.length - 1] === ENTER))
+  .map((chars) => chars.slice(0, -1).join(''))
   .subscribe((events: any) => {
     console.log(events);
   });
