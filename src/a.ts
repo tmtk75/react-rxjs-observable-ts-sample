@@ -12,16 +12,23 @@ Observable.fromPromise(KiiUser.authenticate("tmtk75", "abc123"))
 
 const ENTER = {};
 
-Rx.Observable.fromEvent(document, 'keypress')
+const keySource = Rx.Observable.fromEvent(document, 'keypress')
+
+keySource
   .filter((e: any) => e.target.tagName !== 'INPUT')
   .filter(e => e.charCode || e.keyCode === 13)
   .map((e) => e.keyCode === 13 ? ENTER : String.fromCharCode(e.charCode))
-  .buffer(
-    Rx.Observable.fromEvent(document, 'keypress')
-      .debounceTime(500)
-  )
+  //.buffer(keySource.debounceTime(500))
+  .bufferTime(500)
   //.filter((chars) => chars && chars.length > 1 && ( chars[chars.length - 1] === ENTER))
-  .map((chars) => chars.slice(0, -1).join(''))
+  .map((chars) => chars /* .slice(0, -1) */.join(''))
   .subscribe((events: any) => {
-    console.log(events);
+    console.log("events:", events);
   });
+
+var button = document.querySelector('button');
+Rx.Observable.fromEvent(button, 'click')
+  .scan((count: number) => count + 1, 0)
+  //.throttleTime(1000)
+  //.takeUntil(Observable.interval(1000))
+  .subscribe(count => console.log(`Clicked ${count} times`));

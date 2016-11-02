@@ -76,7 +76,7 @@ export default class App extends React.Component<AppProps, any> {
         <FlatButton
           label="connect"
           disabled={!!client || !user}
-          onClick={() => dispatch(createAction("CONNECT")(group))}
+          onClick={() => dispatch(createAction("CONNECT")({group}))}
           />
         <FlatButton
           disabled={!client}

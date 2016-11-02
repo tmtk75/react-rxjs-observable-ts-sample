@@ -95,7 +95,7 @@ function kiiSend(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Promise<
 
 const connectEpic = epicFromPromise("CONNECT", (action, store) => 
         kiiPush().then(conf =>
-          kiiTopic(action.payload, "status")
+          kiiTopic(action.payload.group, "status")
             .then(topic => kiiWS(conf, store)
               .then(_ => kiiSend(topic)))))
 

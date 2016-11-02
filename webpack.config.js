@@ -5,6 +5,7 @@ module.exports = {
   entry: {
     bundle: "./src/bundle.js",
     a: "./src/a.ts",
+    b: "./src/b.ts",
   },
 
   output: {
