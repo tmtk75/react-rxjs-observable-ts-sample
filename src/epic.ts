@@ -4,7 +4,7 @@ import 'rxjs/add/operator/map'
 import { combineEpics, ActionsObservable } from 'redux-observable'
 import * as Paho from "paho"
 import {
-  Kii, KiiUser, KiiGroup, KiiTopic, KiiPushMessageBuilder, KiiPushMessage,
+  Kii, KiiUser, KiiGroup, KiiTopic, KiiPushMessageBuilder, KiiPushMessage, KiiMqttEndpoint,
 } from "kii-sdk"
 
 type ToPromise = (x: Action<any>, s: Redux.Store<any>) => Promise<any>
@@ -45,7 +45,7 @@ function join(token: string): Promise<{user: KiiUser, group: KiiGroup}> {
 
 const joinEpic = epicFromPromise('JOIN', (x) => join(x.payload.github_token))
 
-function kiiPush(sender: KiiUser): Promise<any> {
+function kiiPush(sender: KiiUser): Promise<KiiMqttEndpoint> {
   const s = sender.pushInstallation();
   return s.installMqtt(false)
     .then(({installationID}) => s.getMqttEndpoint(installationID))
@@ -66,7 +66,7 @@ function kiiTopic(group: KiiGroup, name: string): Promise<KiiTopic> {
     })
 }
 
-function kiiWS(conf: any, store: Redux.Store<any>): Promise<Paho.MQTT.Client> {
+function kiiWS(conf: KiiMqttEndpoint, store: Redux.Store<any>): Promise<Paho.MQTT.Client> {
   const client = new Paho.MQTT.Client(conf.host, conf.portWS, conf.mqttTopic);
   client.onConnectionLost = (res) => store.dispatch({type: "CONNECTION-LOST", payload: res});
   client.onMessageArrived = (msg) => store.dispatch({type: "MESSAGE-ARRIVED", payload: JSON.parse(msg.payloadString)});
@@ -106,7 +106,6 @@ const connectEpic = epicFromPromise("CONNECT", (action: Action<ConnectPayload>, 
         kiiPush(KiiUser.getCurrentUser()).then(conf =>
           kiiTopic(action.payload, "status")
             .then(topic => kiiWS(conf, store)
-              //.then(_ => kiiSend(topic))
               .then(_ => ({topic}))
             )))
 

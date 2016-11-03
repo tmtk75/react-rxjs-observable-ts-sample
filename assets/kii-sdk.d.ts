@@ -59,5 +59,14 @@ declare module "kii-sdk" {
     constructor(a: any);
     build(): KiiPushMessage;
   }
+
+  export interface KiiMqttEndpoint {
+    host: string;
+    portWS: number;
+    username: string;
+    password: string;
+    mqttTopic: string;
+  }
+
 }
 
