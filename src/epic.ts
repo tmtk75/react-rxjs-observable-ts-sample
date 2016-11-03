@@ -19,10 +19,10 @@ const epicFromPromise = (type: string, genPromise: ToPromise) =>
       }))))
     .map((payload: any) => (payload.error ? payload : {type: `${type}.resolved`, payload}))
 
-const signUpEpic = epicFromPromise("SIGN-UP", (x) =>
+const signUpEpic = epicFromPromise("SIGN-UP", (x: Action<SignUpPayload>) =>
   KiiUser.userWithUsername(x.payload.username, x.payload.password).register())
 
-const signInEpic = epicFromPromise("SIGN-IN", (x) =>
+const signInEpic = epicFromPromise("SIGN-IN", (x: Action<SignInPayload>) =>
   KiiUser.authenticate(x.payload.username, x.payload.password)
     .then(u => u.memberOfGroups())
     .then(([user, groups]) => ({user, groups}))

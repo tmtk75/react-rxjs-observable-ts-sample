@@ -29,6 +29,13 @@ declare global {
     group: KiiGroup,
   }
 
+  type SignUpPayload = {
+    username: string,
+    password: string,
+  }
+
+  type SignInPayload = SignUpPayload;
+
 }
 
 declare module "redux-actions" {
