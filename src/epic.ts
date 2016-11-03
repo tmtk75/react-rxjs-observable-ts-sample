@@ -93,7 +93,7 @@ function kiiSend(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Promise<
   return topic.sendMessage(msg)
 }
 
-const updateStatusEpic = epicFromPromise("SEND-STATUS", (a) =>
+const sendStatusEpic = epicFromPromise("SEND-STATUS", (a) =>
   kiiSend(a.payload.topic, a.payload.status)
 )
 
@@ -149,7 +149,7 @@ function inviteUser(invitee: string): Promise<KiiGroup> {
 export const rootEpic = combineEpics(
   joinEpic,
   connectEpic,
-  updateStatusEpic,
+  sendStatusEpic,
   combineEpics(
     signUpEpic,
     signInEpic,
