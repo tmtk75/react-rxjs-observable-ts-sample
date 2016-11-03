@@ -140,15 +140,15 @@ const connectResolvedEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiic
          })
          .mapTo({type: "RECONNECTING.end-retry"})
 
-function inviteUser(invitee: string): Promise<KiiGroup> {
-  return KiiUser.findUserByUsername(invitee)
-    .then(user => [user, KiiGroup.groupWithID("kiicorp")])
-    .then(([user, group]) => {
-      (group as KiiGroup).addUser(user as KiiUser);
-      (group as KiiGroup).save()
-      return {user, group}
-    })
-}
+//function inviteUser(invitee: string): Promise<KiiGroup> {
+//  return KiiUser.findUserByUsername(invitee)
+//    .then(user => [user, KiiGroup.groupWithID("kiicorp")])
+//    .then(([user, group]) => {
+//      (group as KiiGroup).addUser(user as KiiUser);
+//      (group as KiiGroup).save()
+//      return {user, group}
+//    })
+//}
 
 export const rootEpic = combineEpics(
   joinEpic,

@@ -71,7 +71,7 @@ export default class App extends React.Component<AppProps, any> {
           />
         <FlatButton
           label="join"
-          disabled={!user}
+          disabled={!user || !this.state.github_token}
           onClick={_ => dispatch(createAction("JOIN")({
             github_token: this.state.github_token,
           }))}
@@ -90,7 +90,7 @@ export default class App extends React.Component<AppProps, any> {
           />
         <FlatButton
           label="connect"
-          disabled={!!client || !user}
+          disabled={!!client || !user || !group}
           onClick={_ => dispatch(connect(group))}
           />
         <FlatButton
