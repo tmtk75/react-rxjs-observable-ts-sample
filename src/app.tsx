@@ -31,7 +31,7 @@ export default class App extends React.Component<AppProps, any> {
     }
   }
   render() {
-    const { dispatch, kiicloud: { profile: { user, group, topic }, mqtt: { client } }, message: { value } } = this.props;
+    const { dispatch, kiicloud: { profile: { user, group }, mqtt: { client } }, message: { value } } = this.props;
     return (
       <div>
         <TextField
@@ -81,14 +81,12 @@ export default class App extends React.Component<AppProps, any> {
           floatingLabelText="status"
           value={this.state.status}
           onChange={(e: React.FormEvent<TextField>) => this.setState({status: (e.target as any).value})}
+          onKeyDown={e => e.keyCode === 13 ? this.sendMessage(e) : null}
           />
         <FlatButton
           label="send"
           disabled={!(client && user) || !this.state.status}
-          onClick={_ => {
-            dispatch(createAction("SEND-MESSAGE")({topic, status: {message: this.state.status}}))
-            this.setState({status: ""});
-          }}
+          onClick={this.sendMessage.bind(this)}
           />
         <FlatButton
           label="connect"
@@ -108,5 +106,11 @@ export default class App extends React.Component<AppProps, any> {
         </div>
       </div>
     )
+  }
+
+  sendMessage(e: React.FormEvent<any>) {
+    const { dispatch, kiicloud: { profile: { topic } } } = this.props;
+    dispatch(createAction("SEND-MESSAGE")({topic, status: {message: this.state.status}}))
+    this.setState({status: ""});
   }
 }
