@@ -23,6 +23,7 @@ declare module "kii-sdk" {
 
   export class KiiUser {
     static userWithUsername(username: string, password: string): KiiUser;
+    static userWithURI(uri: string): KiiUser;
     static authenticateWithToken(token: string): Promise<KiiUser>;
     static getCurrentUser(): KiiUser;
     static findUserByUsername(username: string): Promise<KiiUser>;
@@ -51,6 +52,7 @@ declare module "kii-sdk" {
   }
 
   export class KiiPushMessage {
+    senderURI: string;
   }
 
   export class KiiPushMessageBuilder {

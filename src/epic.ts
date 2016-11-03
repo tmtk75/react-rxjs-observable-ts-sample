@@ -4,7 +4,7 @@ import 'rxjs/add/operator/map'
 import { combineEpics, ActionsObservable } from 'redux-observable'
 import * as Paho from "paho"
 import {
-  Kii, KiiUser, KiiGroup, KiiTopic, KiiPushMessageBuilder,
+  Kii, KiiUser, KiiGroup, KiiTopic, KiiPushMessageBuilder, KiiPushMessage,
 } from "kii-sdk"
 
 type ToPromise = (x: Action<any>, s: Redux.Store<any>) => Promise<any>
@@ -97,6 +97,10 @@ const sendStatusEpic = epicFromPromise("SEND-MESSAGE", (a) =>
   kiiSend(a.payload.topic, a.payload.status)
 )
 
+const messageArrivedEpic = epicFromPromise("MESSAGE-ARRIVED", (a: Action<KiiPushMessage>) =>
+  KiiUser.userWithURI(a.payload.senderURI).refresh()
+)
+
 const connectEpic = epicFromPromise("CONNECT", (action, store) =>
         kiiPush().then(conf =>
           kiiTopic(action.payload, "status")
@@ -150,6 +154,7 @@ export const rootEpic = combineEpics(
   joinEpic,
   connectEpic,
   sendStatusEpic,
+  messageArrivedEpic,
   combineEpics(
     signUpEpic,
     signInEpic,
