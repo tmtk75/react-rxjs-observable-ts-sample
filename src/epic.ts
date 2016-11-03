@@ -97,7 +97,12 @@ const connectEpic = epicFromPromise("CONNECT", (action, store) =>
         kiiPush().then(conf =>
           kiiTopic(action.payload, "status")
             .then(topic => kiiWS(conf, store)
-              .then(_ => kiiSend(topic)))))
+              .then(_ => ({topic, message: kiiSend(topic)}))
+              .then(a => {
+                console.log(a);
+                return a
+              })
+            )))
 
 const connectionLostEpic = (a: ActionsObservable<any>, store: Redux.Store<any>) =>
         a.ofType("CONNECTION-LOST")

@@ -16,6 +16,9 @@ const profile = handleActions({
   "JOIN.resolved": (state: any, action: Action<any>) => {
     return Object.assign({}, state, action.payload);
   },
+  "CONNECT.resolved": (state: any, action: Action<any>) => {
+    return Object.assign({}, state, action.payload);
+  },
 }, {} /* initial state */)
 
 const mqtt = handleActions({

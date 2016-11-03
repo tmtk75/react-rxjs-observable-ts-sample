@@ -17,6 +17,7 @@ type AppState = {
   username: string,
   password: string,
   github_token: string,
+  status: string,
 }
 
 export default class App extends React.Component<AppProps, any> {
@@ -26,6 +27,7 @@ export default class App extends React.Component<AppProps, any> {
       username: "tmtk75",
       password: "abc123",
       github_token: props.github_token,
+      status: "",
     }
   }
   render() {
@@ -72,6 +74,19 @@ export default class App extends React.Component<AppProps, any> {
           disabled={!user}
           onClick={() => dispatch(createAction("JOIN")({
             github_token: this.state.github_token,
+          }))}
+          />
+        <TextField
+          name="status"
+          floatingLabelText="status"
+          value={this.state.status}
+          onChange={(e: React.FormEvent<TextField>) => this.setState({status: (e.target as any).value})}
+          />
+        <FlatButton
+          label="update"
+          disabled={!(client && user)}
+          onClick={() => dispatch(createAction("UPDATE-STATUS")({
+            status: this.state.status,
           }))}
           />
         <FlatButton
