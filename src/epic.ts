@@ -116,7 +116,7 @@ const connectionLostEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicl
     a.ofType("CONNECTION-LOST").mapTo({type: "CONNECT.start-retry"}),
 
     a.ofType("CONNECT.start-retry")
-      .do(_ => console.group("start-retry"))
+      .do(_ => console.group("CONNECT.retry"))
       .mapTo({type: "CONNECT.retry"}),
 
     a.ofType("CONNECT.rejected").mapTo({type: "CONNECT.retry"}),
