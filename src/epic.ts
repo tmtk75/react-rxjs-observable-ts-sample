@@ -103,8 +103,8 @@ const sendStatusEpic = epicFromPromise("SEND-MESSAGE", (a: Action<SendMessagePay
 //)
 
 const connectEpic = epicFromPromise("CONNECT", (action: Action<ConnectPayload>, store: Redux.Store<any>) =>
-        kiiPush(action.payload.sender).then(conf =>
-          kiiTopic(action.payload.group, "status")
+        kiiPush(KiiUser.getCurrentUser()).then(conf =>
+          kiiTopic(action.payload, "status")
             .then(topic => kiiWS(conf, store)
               //.then(_ => kiiSend(topic))
               .then(_ => ({topic}))

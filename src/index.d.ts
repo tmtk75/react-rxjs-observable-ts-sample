@@ -24,10 +24,7 @@ declare global {
     },
   }
 
-  type ConnectPayload = {
-    sender: KiiUser,
-    group: KiiGroup,
-  }
+  type ConnectPayload = KiiGroup;
 
   type SignUpPayload = {
     username: string,
