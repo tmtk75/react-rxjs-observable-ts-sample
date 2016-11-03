@@ -10,12 +10,14 @@ declare global {
         groups: Array<KiiGroup>,
         topic: KiiTopic,
       },
-      mqtt: {
-        endpoint: KiiMqttEndpoint,
-        client: Paho.MQTT.Client,
-        retryCount: number,
-      },
+      mqtt: MQTTState,
   }
+
+  type MQTTState = {
+     endpoint: KiiMqttEndpoint,
+     client: Paho.MQTT.Client,
+     retryCount: number,
+   }
 
   type SendMessagePayload = {
     topic: KiiTopic,

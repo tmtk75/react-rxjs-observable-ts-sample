@@ -1,55 +1,57 @@
 import { handleActions, Action } from "redux-actions"
 import { combineReducers } from "redux"
 
+const assign = Object.assign;
+
 const profile = handleActions({
-  "SIGN-UP.resolved": (state: any, action: Action<any>) => {
-    return Object.assign({}, state, {user: action.payload});
+  "SIGN-UP.resolved": (s: any, a: Action<any>) => {
+    return assign({}, s, {user: a.payload});
   },
-  "SIGN-IN.resolved": (state: any, action: Action<any>) => {
-    const { user, groups } = action.payload;
-    return Object.assign({}, state, {
+  "SIGN-IN.resolved": (s: any, a: Action<any>) => {
+    const { user, groups } = a.payload;
+    return assign({}, s, {
       user,
       group: groups ? groups[0] : null,
       groups,
     });
   },
-  "JOIN.resolved": (state: any, action: Action<any>) => {
-    return Object.assign({}, state, action.payload);
+  "JOIN.resolved": (s: any, a: Action<any>) => {
+    return assign({}, s, a.payload);
   },
-  "CONNECT.resolved": (state: any, action: Action<any>) => {
-    return Object.assign({}, state, action.payload);
+  "CONNECT.resolved": (s: any, a: Action<any>) => {
+    return assign({}, s, a.payload);
   },
 }, {} /* initial state */)
 
 const mqtt = handleActions({
-  "CONNECTION-ALIVE": (state: any, action: Action<any>) => {
-    return Object.assign({}, state, action.payload);
+  "CONNECTION-ALIVE": (s: MQTTState, a: Action<any>) => {
+    return assign({}, s, a.payload);
   },
-  "CONNECTION-LOST": (state: any, action: Action<any>) => {
-    return Object.assign({}, state, {endpoint: null, client: null});
+  "CONNECTION-LOST": (s: MQTTState, a: Action<any>) => {
+    return assign({}, s, {endpoint: null, client: null});
   },
-  "CONNECT.start-retry": (state: any, action: Action<any>) => {
-    return Object.assign({}, state, {retryCount: 0});
+  "CONNECT.start-retry": (s: MQTTState, a: Action<any>) => {
+    return assign({}, s, {retryCount: 0});
   },
-  "CONNECT.retry": (state: any, action: Action<any>) => {
-    return Object.assign({}, state, {retryCount: state.retryCount + 1});
+  "CONNECT.retry": (s: MQTTState, a: Action<any>) => {
+    return assign({}, s, {retryCount: s.retryCount + 1});
   },
-  "CONNECT.end-retry": (state: any, action: Action<any>) => {
-    return Object.assign({}, state, {retryCount: null});
+  "CONNECT.end-retry": (s: MQTTState, a: Action<any>) => {
+    return assign({}, s, {retryCount: null});
   },
 }, {} /* initial state */)
 
 const message = handleActions({
-  "MESSAGE-ARRIVED":  (state: any, action: Action<any>) => {
-    return Object.assign({}, state, action.payload);
+  "MESSAGE-ARRIVED":  (s: any, a: Action<any>) => {
+    return assign({}, s, a.payload);
   },
 }, {} /* initial state */)
 
-const rejected = (state: any = {}, action: Action<any>) => {
-  if (action.type.match(/\.rejected$/)) {
-    console.error(action.type, action.payload);
+const rejected = (s: any = {}, a: Action<any>) => {
+  if (a.type.match(/\.rejected$/)) {
+    console.error(a.type, a.payload);
   }
-  return state;
+  return s;
 }
 
 export const reducer = combineReducers({
