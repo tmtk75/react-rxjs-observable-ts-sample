@@ -93,7 +93,7 @@ function kiiSend(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Promise<
   return topic.sendMessage(msg)
 }
 
-const sendStatusEpic = epicFromPromise("SEND-STATUS", (a) =>
+const sendStatusEpic = epicFromPromise("SEND-MESSAGE", (a) =>
   kiiSend(a.payload.topic, a.payload.status)
 )
 
@@ -101,15 +101,15 @@ const connectEpic = epicFromPromise("CONNECT", (action, store) =>
         kiiPush().then(conf =>
           kiiTopic(action.payload, "status")
             .then(topic => kiiWS(conf, store)
-              .then(_ => kiiSend(topic))
-              .then(([topic, msg]) => ({topic}))
+              //.then(_ => kiiSend(topic))
+              .then(_ => ({topic}))
             )))
 
-const connectionLostEpic = (a: ActionsObservable<any>, store: Redux.Store<any>) =>
+const connectionLostEpic = (a: ActionsObservable<any>) =>
         a.ofType("CONNECTION-LOST")
          .mapTo({type: "RECONNECTING.start-retry"})
 
-const startReconnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<any>) =>
+const startReconnectingEpic = (a: ActionsObservable<any>) =>
         a.ofType("RECONNECTING.start-retry")
          .do(_ => console.group("start-retry"))
          .mapTo({type: "RECONNECTING.retry"})
@@ -123,7 +123,7 @@ const retryConnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiic
          .delayWhen(t => Rx.Observable.of(true).delay(t as number))
          .map(x => connect(store.getState().kiicloud.profile.group))
 
-const connectRejectedEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
+const connectRejectedEpic = (a: ActionsObservable<any>) =>
         a.ofType("CONNECT.rejected")
          .mapTo({type: "RECONNECTING.retry"})
 

@@ -86,7 +86,7 @@ export default class App extends React.Component<AppProps, any> {
           label="send"
           disabled={!(client && user) || !this.state.status}
           onClick={_ => {
-            dispatch(createAction("SEND-STATUS")({topic, status: {message: this.state.status}}))
+            dispatch(createAction("SEND-MESSAGE")({topic, status: {message: this.state.status}}))
             this.setState({status: ""});
           }}
           />
