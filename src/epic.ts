@@ -99,6 +99,7 @@ const sendStatusEpic = epicFromPromise("SEND-MESSAGE", (a) =>
 
 const messageArrivedEpic = epicFromPromise("MESSAGE-ARRIVED", (a: Action<KiiPushMessage>) =>
   KiiUser.userWithURI(a.payload.senderURI).refresh()
+    .then(u => u.getUsername())
 )
 
 const connectEpic = epicFromPromise("CONNECT", (action, store) =>
