@@ -67,6 +67,12 @@ function getTopic(group: KiiGroup, name: string): Promise<KiiTopic> {
 }
 
 function connectWS(ep: KiiMqttEndpoint, store: Redux.Store<any>): Promise<Paho.MQTT.Client> {
+  const instore = store.getState().kiicloud.mqtt.client
+  if (instore) {
+    console.warn("already connected:", instore)
+    return Promise.resolve(instore)
+  }
+
   const client = new Paho.MQTT.Client(ep.host, ep.portWS, ep.mqttTopic);
   client.onConnectionLost = (res) => store.dispatch({type: "CONNECTION-LOST", payload: res});
   client.onMessageArrived = (msg) => store.dispatch({type: "MESSAGE-ARRIVED", payload: JSON.parse(msg.payloadString)});
