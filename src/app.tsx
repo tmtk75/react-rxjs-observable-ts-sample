@@ -80,7 +80,7 @@ export default class App extends React.Component<AppProps, any> {
           onClick={() => dispatch(connect(group))}
           />
         <FlatButton
-          disabled={!client}
+          disabled={!(!!client || !user)}
           label="disconnect"
           onClick={() => dispatch(disconnect(this.props.kiicloud))}
           />
