@@ -28,6 +28,9 @@ const mqtt = handleActions({
   "START-RECONNECTING": (state: any, action: Action<any>) => {
     return Object.assign({}, state, {retryCount: 0});
   },
+  "RETRY-CONNECTING": (state: any, action: Action<any>) => {
+    return Object.assign({}, state, {retryCount: state.retryCount + 1});
+  },
 }, {retryCount: 0} /* initial state */)
 
 const message = handleActions({

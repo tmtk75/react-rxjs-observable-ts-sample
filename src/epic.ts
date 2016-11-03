@@ -93,32 +93,37 @@ function kiiSend(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Promise<
   return topic.sendMessage(msg)
 }
 
-const connectEpic = epicFromPromise("CONNECT", (action, store) => 
-        kiiPush().then(conf =>
+const connectEpic = epicFromPromise("CONNECT", (action, store) => {
+  console.log("action:", action);
+return        kiiPush().then(conf =>
           kiiTopic(action.payload, "status")
             .then(topic => kiiWS(conf, store)
-              .then(_ => kiiSend(topic)))))
+              .then(_ => kiiSend(topic))))})
 
-import { startReconnecting } from "./action"
+import {
+  startReconnecting,
+  retryConnecting,
+  connect,
+} from "./action"
+
 const connectionLostEpic = (a: ActionsObservable<any>, store: Redux.Store<any>) =>
         a.ofType("CONNECTION-LOST")
-         .mapTo(startReconnecting(0))
+         .mapTo(startReconnecting())
 
-import { connect } from "./action"
 const startReconnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<any>) =>
         a.ofType("START-RECONNECTING")
-         .mapTo(connect(store.getState().kiicloud.profile.group))
+         .mapTo(retryConnecting())
 
 const retryConnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
+        a.ofType("RETRY-CONNECTING")
+         //.do(x => console.log("group:", store.getState().kiicloud.profile.group))
+         .map(x => connect(store.getState().kiicloud.profile.group))
+
+const connectRejectedEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
         a.ofType("CONNECT.rejected")
+         .mapTo(retryConnecting())
+         .do(x => console.log("retryCount:", store.getState().kiicloud.mqtt.retryCount))
          .delay(1000 * store.getState().kiicloud.mqtt.retryCount)
-         .mapTo({
-           type: "RETRY-CONNECTING",
-           payload: {
-             group: store.getState().kiicloud.profile.group,
-             retry: 3,
-           },
-         })
 
 function inviteUser(invitee: string): Promise<KiiGroup> {
   return KiiUser.findUserByUsername(invitee)
@@ -140,6 +145,7 @@ export const rootEpic = combineEpics(
   combineEpics(
     connectionLostEpic,
     startReconnectingEpic,
+    connectRejectedEpic,
     retryConnectingEpic,
   ),
 );
