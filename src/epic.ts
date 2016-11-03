@@ -106,12 +106,12 @@ const connectionLostEpic = (a: ActionsObservable<any>, store: Redux.Store<any>) 
 const startReconnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<any>) =>
         a.ofType("RECONNECTING.start-retry")
          .do(_ => console.group("start-retry"))
-         .mapTo({type: "CONNECTING.retry"})
+         .mapTo({type: "RECONNECTING.retry"})
 
 import { connect } from "./action"
 
 const retryConnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
-        a.ofType("CONNECTING.retry")
+        a.ofType("RECONNECTING.retry")
          .map(_ => 1000 * (2 ** (store.getState().kiicloud.mqtt.retryCount - 1)))
          .do(t => console.log(`retry connecting ${t}ms later.`))
          .delayWhen(t => Rx.Observable.of(true).delay(t as number))
@@ -119,7 +119,7 @@ const retryConnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiic
 
 const connectRejectedEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
         a.ofType("CONNECT.rejected")
-         .mapTo({type: "CONNECTING.retry"})
+         .mapTo({type: "RECONNECTING.retry"})
 
 const connectResolvedEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
         a.ofType("CONNECT.resolved")
