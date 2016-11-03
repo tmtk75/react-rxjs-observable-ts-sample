@@ -10,4 +10,9 @@ export const disconnect = createAction("DISCONNECT", (e: KiiCloudState) => {
 export const {
   startReconnecting,
   retryConnecting,
-} = createActions({}, "START-RECONNECTING", "RETRY-CONNECTING");
+  endReconnecting,
+} = createActions({},
+  "START-RECONNECTING",
+  "RETRY-CONNECTING",
+  "END-RECONNECTING",
+);
