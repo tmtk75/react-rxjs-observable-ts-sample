@@ -109,36 +109,32 @@ const connectEpic = epicFromPromise("CONNECT", (action: Action<ConnectPayload>, 
               .then(_ => ({topic}))
             )))
 
-const connectionLostEpic = (a: ActionsObservable<any>) =>
-        a.ofType("CONNECTION-LOST")
-         .mapTo({type: "RECONNECTING.start-retry"})
-
-const startReconnectingEpic = (a: ActionsObservable<any>) =>
-        a.ofType("RECONNECTING.start-retry")
-         .do(_ => console.group("start-retry"))
-         .mapTo({type: "RECONNECTING.retry"})
-
 import { connect } from "./action"
 
-const retryConnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
-        a.ofType("RECONNECTING.retry")
-         .map(_ => 1000 * (2 ** (store.getState().kiicloud.mqtt.retryCount - 1)))
-         .do(t => console.log(`retry connecting ${t}ms later.`))
-         .delayWhen(t => Rx.Observable.of(true).delay(t as number))
-         .map(x => connect(store.getState().kiicloud.profile.group))
+const connectionLostEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
+  Rx.Observable.of(
+    a.ofType("CONNECTION-LOST").mapTo({type: "RECONNECTING.start-retry"}),
 
-const connectRejectedEpic = (a: ActionsObservable<any>) =>
-        a.ofType("CONNECT.rejected")
-         .mapTo({type: "RECONNECTING.retry"})
+    a.ofType("RECONNECTING.start-retry")
+      .do(_ => console.group("start-retry"))
+      .mapTo({type: "RECONNECTING.retry"}),
 
-const connectResolvedEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
-        a.ofType("CONNECT.resolved")
-         .filter(_ => store.getState().kiicloud.mqtt.retryCount > 0)
-         .do(_ => {
-           console.log(`retry connecting succeeded. retry-count: ${store.getState().kiicloud.mqtt.retryCount}`);
-           console.groupEnd();
-         })
-         .mapTo({type: "RECONNECTING.end-retry"})
+    a.ofType("CONNECT.rejected").mapTo({type: "RECONNECTING.retry"}),
+
+    a.ofType("RECONNECTING.retry")
+      .map(_ => 1000 * (2 ** (store.getState().kiicloud.mqtt.retryCount - 1)))
+      .do(t => console.log(`retry connecting ${t}ms later.`))
+      .delayWhen(t => Rx.Observable.of(true).delay(t as number))
+      .map(x => connect(store.getState().kiicloud.profile.group)),
+
+    a.ofType("CONNECT.resolved")
+      .filter(_ => store.getState().kiicloud.mqtt.retryCount > 0)
+      .do(_ => {
+        console.log(`retry connecting succeeded. retry-count: ${store.getState().kiicloud.mqtt.retryCount}`);
+        console.groupEnd();
+      })
+      .mapTo({type: "RECONNECTING.end-retry"}),
+  ).mergeAll()
 
 //function inviteUser(invitee: string): Promise<KiiGroup> {
 //  return KiiUser.findUserByUsername(invitee)
@@ -159,11 +155,5 @@ export const rootEpic = combineEpics(
     signUpEpic,
     signInEpic,
   ),
-  combineEpics(
-    connectionLostEpic,
-    startReconnectingEpic,
-    connectRejectedEpic,
-    retryConnectingEpic,
-    connectResolvedEpic,
-  ),
+  connectionLostEpic,
 );
