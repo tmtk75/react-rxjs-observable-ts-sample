@@ -116,14 +116,16 @@ const startReconnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<any
 
 const retryConnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
         a.ofType("RETRY-CONNECTING")
-         //.do(x => console.log("group:", store.getState().kiicloud.profile.group))
-         .map(x => connect(store.getState().kiicloud.profile.group))
+         .map(x => connect(store.getState().kiicloud.profile.group))  //NOTE: Why mapTo doesn't work?
 
 const connectRejectedEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
         a.ofType("CONNECT.rejected")
          .mapTo(retryConnecting())
-         .do(x => console.log("retryCount:", store.getState().kiicloud.mqtt.retryCount))
-         .delay(1000 * store.getState().kiicloud.mqtt.retryCount)
+         .delayWhen(x => {
+           const t = 1000 * (2 ** store.getState().kiicloud.mqtt.retryCount)
+           console.log(t)
+           return Rx.Observable.of(true).delay(t)
+         })
 
 function inviteUser(invitee: string): Promise<KiiGroup> {
   return KiiUser.findUserByUsername(invitee)
