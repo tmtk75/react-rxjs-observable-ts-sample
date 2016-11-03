@@ -93,14 +93,14 @@ function kiiSend(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Promise<
   return topic.sendMessage(msg)
 }
 
-const sendStatusEpic = epicFromPromise("SEND-MESSAGE", (a) =>
+const sendStatusEpic = epicFromPromise("SEND-MESSAGE", (a: Action<SentMessage>) =>
   kiiSend(a.payload.topic, a.payload.status)
 )
 
-const messageArrivedEpic = epicFromPromise("MESSAGE-ARRIVED", (a: Action<KiiPushMessage>) =>
-  KiiUser.userWithURI(a.payload.senderURI).refresh()
-    .then(u => u.getUsername())
-)
+//const messageArrivedEpic = epicFromPromise("MESSAGE-ARRIVED", (a: Action<KiiPushMessage>) =>
+//  KiiUser.userWithURI(a.payload.senderURI).refresh()
+//    .then(u => u.getUsername())
+//)
 
 const connectEpic = epicFromPromise("CONNECT", (action, store) =>
         kiiPush().then(conf =>
@@ -155,7 +155,7 @@ export const rootEpic = combineEpics(
   joinEpic,
   connectEpic,
   sendStatusEpic,
-  messageArrivedEpic,
+  //messageArrivedEpic,
   combineEpics(
     signUpEpic,
     signInEpic,

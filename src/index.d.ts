@@ -17,6 +17,13 @@ declare global {
       },
   }
 
+  type SentMessage = {
+    topic: KiiTopic,
+    status: {
+      message: string,
+    },
+  }
+
 }
 
 declare module "redux-actions" {
