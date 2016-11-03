@@ -43,7 +43,7 @@ function join(token: string): Promise<{user: KiiUser, group: KiiGroup}> {
     .then(([user, group]) => ({user, group}))
 }
 
-const joinEpic = epicFromPromise('JOIN', (x) => join(x.payload.github_token))
+const joinEpic = epicFromPromise('JOIN', (x: Action<JoinPayload>) => join(x.payload.github_token))
 
 function kiiPush(sender: KiiUser): Promise<KiiMqttEndpoint> {
   const s = sender.pushInstallation();

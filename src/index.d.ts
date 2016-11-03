@@ -33,6 +33,10 @@ declare global {
 
   type SignInPayload = SignUpPayload;
 
+  type JoinPayload = {
+    github_token: string,
+  }
+
 }
 
 declare module "redux-actions" {
