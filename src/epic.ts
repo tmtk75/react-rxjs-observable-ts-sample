@@ -66,19 +66,19 @@ function kiiTopic(group: KiiGroup, name: string): Promise<KiiTopic> {
     })
 }
 
-function kiiWS(conf: KiiMqttEndpoint, store: Redux.Store<any>): Promise<Paho.MQTT.Client> {
-  const client = new Paho.MQTT.Client(conf.host, conf.portWS, conf.mqttTopic);
+function kiiWS(ep: KiiMqttEndpoint, store: Redux.Store<any>): Promise<Paho.MQTT.Client> {
+  const client = new Paho.MQTT.Client(ep.host, ep.portWS, ep.mqttTopic);
   client.onConnectionLost = (res) => store.dispatch({type: "CONNECTION-LOST", payload: res});
   client.onMessageArrived = (msg) => store.dispatch({type: "MESSAGE-ARRIVED", payload: JSON.parse(msg.payloadString)});
   return new Promise((resolve, reject) => {
     client.connect({
-      userName: conf.username,
-      password: conf.password,
+      userName: ep.username,
+      password: ep.password,
       onSuccess: () => {
-        client.subscribe(conf.mqttTopic);
+        client.subscribe(ep.mqttTopic);
         resolve(client);
         store.dispatch({type: "CONNECTION-ALIVE", payload: {
-          pushSubscription: conf,
+          endpoint: ep,
           client,
         }});
       },

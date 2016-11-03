@@ -1,5 +1,5 @@
 import * as Paho from "paho"
-import { KiiUser, KiiGroup, KiiPushSubscription, KiiTopic } from "kii-sdk"
+import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint} from "kii-sdk"
 
 declare global {
 
@@ -11,7 +11,7 @@ declare global {
         topic: KiiTopic,
       },
       mqtt: {
-        pushSubscription: KiiPushSubscription,
+        endpoint: KiiMqttEndpoint,
         client: Paho.MQTT.Client,
         retryCount: number,
       },
