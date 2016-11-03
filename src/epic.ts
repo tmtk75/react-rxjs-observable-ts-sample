@@ -45,8 +45,8 @@ function join(token: string): Promise<{user: KiiUser, group: KiiGroup}> {
 
 const joinEpic = epicFromPromise('JOIN', (x) => join(x.payload.github_token))
 
-function kiiPush(): Promise<any> {
-  const s = KiiUser.getCurrentUser().pushInstallation();
+function kiiPush(sender: KiiUser): Promise<any> {
+  const s = sender.pushInstallation();
   return s.installMqtt(false)
     .then(({installationID}) => s.getMqttEndpoint(installationID))
 }
@@ -102,9 +102,9 @@ const sendStatusEpic = epicFromPromise("SEND-MESSAGE", (a: Action<SendMessagePay
 //    .then(u => u.getUsername())
 //)
 
-const connectEpic = epicFromPromise("CONNECT", (action, store) =>
-        kiiPush().then(conf =>
-          kiiTopic(action.payload, "status")
+const connectEpic = epicFromPromise("CONNECT", (action: Action<ConnectPayload>, store: Redux.Store<any>) =>
+        kiiPush(action.payload.sender).then(conf =>
+          kiiTopic(action.payload.group, "status")
             .then(topic => kiiWS(conf, store)
               //.then(_ => kiiSend(topic))
               .then(_ => ({topic}))

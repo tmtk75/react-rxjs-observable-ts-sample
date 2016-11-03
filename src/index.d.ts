@@ -24,6 +24,11 @@ declare global {
     },
   }
 
+  type ConnectPayload = {
+    sender: KiiUser,
+    group: KiiGroup,
+  }
+
 }
 
 declare module "redux-actions" {
