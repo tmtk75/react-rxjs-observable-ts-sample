@@ -50,7 +50,7 @@ export default class App extends React.Component<AppProps, any> {
         <FlatButton
           label="sign up"
           disabled={!!user}
-          onClick={() => dispatch(createAction("SIGN-UP")({
+          onClick={_ => dispatch(createAction("SIGN-UP")({
             username: this.state.username,
             password: this.state.password,
           }))}
@@ -58,7 +58,7 @@ export default class App extends React.Component<AppProps, any> {
         <FlatButton
           label="sign in"
           disabled={!!user}
-          onClick={() => dispatch(createAction("SIGN-IN")({
+          onClick={_ => dispatch(createAction("SIGN-IN")({
             username: this.state.username,
             password: this.state.password,
           }))}
@@ -72,7 +72,7 @@ export default class App extends React.Component<AppProps, any> {
         <FlatButton
           label="join"
           disabled={!user}
-          onClick={() => dispatch(createAction("JOIN")({
+          onClick={_ => dispatch(createAction("JOIN")({
             github_token: this.state.github_token,
           }))}
           />
@@ -85,23 +85,20 @@ export default class App extends React.Component<AppProps, any> {
         <FlatButton
           label="send"
           disabled={!(client && user) || !this.state.status}
-          onClick={() => {
-            dispatch(createAction("SEND-STATUS")({
-              topic,
-              status: {message: this.state.status},
-            }))
+          onClick={_ => {
+            dispatch(createAction("SEND-STATUS")({topic, status: {message: this.state.status}}))
             this.setState({status: ""});
           }}
           />
         <FlatButton
           label="connect"
           disabled={!!client || !user}
-          onClick={() => dispatch(connect(group))}
+          onClick={_ => dispatch(connect(group))}
           />
         <FlatButton
           disabled={!(!!client || !user)}
           label="disconnect"
-          onClick={() => dispatch(disconnect(this.props.kiicloud))}
+          onClick={_ => dispatch(disconnect(this.props.kiicloud))}
           />
         <hr />
         <div>
