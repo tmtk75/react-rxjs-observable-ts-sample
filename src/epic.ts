@@ -99,24 +99,19 @@ const connectEpic = epicFromPromise("CONNECT", (action, store) =>
             .then(topic => kiiWS(conf, store)
               .then(_ => kiiSend(topic)))))
 
-import {
-  startReconnecting,
-  retryConnecting,
-  connect,
-  endReconnecting,
-} from "./action"
-
 const connectionLostEpic = (a: ActionsObservable<any>, store: Redux.Store<any>) =>
         a.ofType("CONNECTION-LOST")
-         .mapTo(startReconnecting())
+         .mapTo({type: "RECONNECTING.start-retry"})
 
 const startReconnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<any>) =>
-        a.ofType("START-RECONNECTING")
-         .do(_ => console.group("retry-connecting"))
-         .mapTo(retryConnecting())
+        a.ofType("RECONNECTING.start-retry")
+         .do(_ => console.group("start-retry"))
+         .mapTo({type: "CONNECTING.retry"})
+
+import { connect } from "./action"
 
 const retryConnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
-        a.ofType("RETRY-CONNECTING")
+        a.ofType("CONNECTING.retry")
          .map(_ => 1000 * (2 ** (store.getState().kiicloud.mqtt.retryCount - 1)))
          .do(t => console.log(`retry connecting ${t}ms later.`))
          .delayWhen(t => Rx.Observable.of(true).delay(t as number))
@@ -124,7 +119,7 @@ const retryConnectingEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiic
 
 const connectRejectedEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
         a.ofType("CONNECT.rejected")
-         .mapTo(retryConnecting())
+         .mapTo({type: "CONNECTING.retry"})
 
 const connectResolvedEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
         a.ofType("CONNECT.resolved")
@@ -133,7 +128,7 @@ const connectResolvedEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiic
            console.log(`retry connecting succeeded. retry-count: ${store.getState().kiicloud.mqtt.retryCount}`);
            console.groupEnd();
          })
-         .mapTo(endReconnecting())
+         .mapTo({type: "RECONNECTING.end-retry"})
 
 function inviteUser(invitee: string): Promise<KiiGroup> {
   return KiiUser.findUserByUsername(invitee)
