@@ -66,11 +66,11 @@ function getTopic(group: KiiGroup, name: string): Promise<KiiTopic> {
     })
 }
 
-function connectWS(ep: KiiMqttEndpoint, store: Redux.Store<any>): Promise<Paho.MQTT.Client> {
-  const instore = store.getState().kiicloud.mqtt.client
-  if (instore) {
-    console.warn("already connected:", instore)
-    return Promise.resolve(instore)
+function connectWS(ep: KiiMqttEndpoint, store: Redux.Store<{kiicloud: KiiCloudState}>): Promise<Paho.MQTT.Client> {
+  const { kiicloud: { mqtt } }  = store.getState()
+  if (mqtt.client) {
+    console.warn("skip connecting because MQTT client is found in store.", mqtt.client)
+    return Promise.resolve(mqtt.client)
   }
 
   const client = new Paho.MQTT.Client(ep.host, ep.portWS, ep.mqttTopic);
