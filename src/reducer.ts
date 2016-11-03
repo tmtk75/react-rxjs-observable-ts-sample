@@ -28,13 +28,13 @@ const mqtt = handleActions({
   "CONNECTION-LOST": (state: any, action: Action<any>) => {
     return Object.assign({}, state, {endpoint: null, client: null});
   },
-  "RECONNECTING.start-retry": (state: any, action: Action<any>) => {
+  "CONNECT.start-retry": (state: any, action: Action<any>) => {
     return Object.assign({}, state, {retryCount: 0});
   },
-  "RECONNECTING.retry": (state: any, action: Action<any>) => {
+  "CONNECT.retry": (state: any, action: Action<any>) => {
     return Object.assign({}, state, {retryCount: state.retryCount + 1});
   },
-  "RECONNECTING.end-retry": (state: any, action: Action<any>) => {
+  "CONNECT.end-retry": (state: any, action: Action<any>) => {
     return Object.assign({}, state, {retryCount: null});
   },
 }, {retryCount: null} /* initial state */)
