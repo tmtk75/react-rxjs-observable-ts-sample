@@ -45,13 +45,13 @@ function join(token: string): Promise<{user: KiiUser, group: KiiGroup}> {
 
 const joinEpic = epicFromPromise('JOIN', (x: Action<JoinPayload>) => join(x.payload.github_token))
 
-function kiiPush(sender: KiiUser): Promise<KiiMqttEndpoint> {
+function getMQTTEndpoint(sender: KiiUser): Promise<KiiMqttEndpoint> {
   const s = sender.pushInstallation();
   return s.installMqtt(false)
     .then(({installationID}) => s.getMqttEndpoint(installationID))
 }
 
-function kiiTopic(group: KiiGroup, name: string): Promise<KiiTopic> {
+function getTopic(group: KiiGroup, name: string): Promise<KiiTopic> {
   return group.listTopics()
     .then(([[topic], _]) => topic ? topic : group.topicWithName(name).save())
     .then(topic => KiiUser.getCurrentUser().pushSubscription().isSubscribed(topic))
@@ -66,7 +66,7 @@ function kiiTopic(group: KiiGroup, name: string): Promise<KiiTopic> {
     })
 }
 
-function kiiWS(ep: KiiMqttEndpoint, store: Redux.Store<any>): Promise<Paho.MQTT.Client> {
+function connectWS(ep: KiiMqttEndpoint, store: Redux.Store<any>): Promise<Paho.MQTT.Client> {
   const client = new Paho.MQTT.Client(ep.host, ep.portWS, ep.mqttTopic);
   client.onConnectionLost = (res) => store.dispatch({type: "CONNECTION-LOST", payload: res});
   client.onMessageArrived = (msg) => store.dispatch({type: "MESSAGE-ARRIVED", payload: JSON.parse(msg.payloadString)});
@@ -87,14 +87,14 @@ function kiiWS(ep: KiiMqttEndpoint, store: Redux.Store<any>): Promise<Paho.MQTT.
   })
 }
 
-function kiiSend(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Promise<any> {
+function sendMessage(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Promise<any> {
   const data = {value: JSON.stringify(m)};
   const msg = new KiiPushMessageBuilder(data).build()
   return topic.sendMessage(msg)
 }
 
 const sendStatusEpic = epicFromPromise("SEND-MESSAGE", (a: Action<SendMessagePayload>) =>
-  kiiSend(a.payload.topic, a.payload.status)
+  sendMessage(a.payload.topic, a.payload.status)
 )
 
 //const messageArrivedEpic = epicFromPromise("MESSAGE-ARRIVED", (a: Action<KiiPushMessage>) =>
@@ -103,9 +103,9 @@ const sendStatusEpic = epicFromPromise("SEND-MESSAGE", (a: Action<SendMessagePay
 //)
 
 const connectEpic = epicFromPromise("CONNECT", (action: Action<ConnectPayload>, store: Redux.Store<any>) =>
-        kiiPush(KiiUser.getCurrentUser()).then(conf =>
-          kiiTopic(action.payload, "status")
-            .then(topic => kiiWS(conf, store)
+        getMQTTEndpoint(KiiUser.getCurrentUser()).then(endpoint =>
+          getTopic(action.payload, "status")
+            .then(topic => connectWS(endpoint, store)
               .then(_ => ({topic}))
             )))
 
