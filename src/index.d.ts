@@ -17,7 +17,7 @@ declare global {
       },
   }
 
-  type SentMessage = {
+  type SendMessagePayload = {
     topic: KiiTopic,
     status: {
       message: string,

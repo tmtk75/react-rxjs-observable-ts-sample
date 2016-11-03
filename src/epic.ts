@@ -93,7 +93,7 @@ function kiiSend(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Promise<
   return topic.sendMessage(msg)
 }
 
-const sendStatusEpic = epicFromPromise("SEND-MESSAGE", (a: Action<SentMessage>) =>
+const sendStatusEpic = epicFromPromise("SEND-MESSAGE", (a: Action<SendMessagePayload>) =>
   kiiSend(a.payload.topic, a.payload.status)
 )
 
