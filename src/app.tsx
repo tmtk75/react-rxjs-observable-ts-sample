@@ -31,7 +31,7 @@ export default class App extends React.Component<AppProps, any> {
     }
   }
   render() {
-    const { dispatch, kiicloud: { profile: { user, group }, mqtt: { client } }, message: { value } } = this.props;
+    const { dispatch, kiicloud: { profile: { user, group, topic }, mqtt: { client } }, message: { value } } = this.props;
     return (
       <div>
         <TextField
@@ -83,11 +83,15 @@ export default class App extends React.Component<AppProps, any> {
           onChange={(e: React.FormEvent<TextField>) => this.setState({status: (e.target as any).value})}
           />
         <FlatButton
-          label="update"
-          disabled={!(client && user)}
-          onClick={() => dispatch(createAction("UPDATE-STATUS")({
-            status: this.state.status,
-          }))}
+          label="send"
+          disabled={!(client && user) || !this.state.status}
+          onClick={() => {
+            dispatch(createAction("SEND-STATUS")({
+              topic,
+              status: {message: this.state.status},
+            }))
+            this.setState({status: ""});
+          }}
           />
         <FlatButton
           label="connect"

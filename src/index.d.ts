@@ -1,5 +1,5 @@
 import * as Paho from "paho"
-import { KiiUser, KiiGroup, KiiPushSubscription } from "kii-sdk"
+import { KiiUser, KiiGroup, KiiPushSubscription, KiiTopic } from "kii-sdk"
 
 declare global {
 
@@ -8,6 +8,7 @@ declare global {
         user: KiiUser,
         group: KiiGroup,
         groups: Array<KiiGroup>,
+        topic: KiiTopic,
       },
       mqtt: {
         pushSubscription: KiiPushSubscription,

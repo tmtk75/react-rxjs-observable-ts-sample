@@ -93,15 +93,16 @@ function kiiSend(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Promise<
   return topic.sendMessage(msg)
 }
 
+const updateStatusEpic = epicFromPromise("SEND-STATUS", (a) =>
+  kiiSend(a.payload.topic, a.payload.status)
+)
+
 const connectEpic = epicFromPromise("CONNECT", (action, store) =>
         kiiPush().then(conf =>
           kiiTopic(action.payload, "status")
             .then(topic => kiiWS(conf, store)
-              .then(_ => ({topic, message: kiiSend(topic)}))
-              .then(a => {
-                console.log(a);
-                return a
-              })
+              .then(_ => kiiSend(topic))
+              .then(([topic, msg]) => ({topic}))
             )))
 
 const connectionLostEpic = (a: ActionsObservable<any>, store: Redux.Store<any>) =>
@@ -148,6 +149,7 @@ function inviteUser(invitee: string): Promise<KiiGroup> {
 export const rootEpic = combineEpics(
   joinEpic,
   connectEpic,
+  updateStatusEpic,
   combineEpics(
     signUpEpic,
     signInEpic,
