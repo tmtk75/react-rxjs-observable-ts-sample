@@ -7,7 +7,7 @@ const assign = Object.assign;
 
 const profile = handleActions({
   "SIGN-UP.resolved": (s: ProfileState, a: Action<KiiUser>) => {
-    return assign({}, s, {user: a.payload});
+    return assign({}, s, {user: a.payload, group: null});
   },
   "SIGN-IN.resolved": (s: ProfileState, a: Action<{user: KiiUser, groups: Array<KiiGroup>}>) => {
     const { user, groups } = a.payload;

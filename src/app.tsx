@@ -15,13 +15,13 @@ type AppProps = {
 }
 
 type AppState = {
-  username: string,
-  password: string,
-  github_token: string,
-  status: string,
+  username?: string,
+  password?: string,
+  github_token?: string,
+  status?: string,
 }
 
-export default class App extends React.Component<AppProps, any> {
+export default class App extends React.Component<AppProps, AppState> {
   constructor(props: any) {
     super(props);
     this.state = {
