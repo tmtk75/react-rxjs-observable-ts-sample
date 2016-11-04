@@ -19,13 +19,18 @@ const epicFromPromise = <P, S, R>(type: string, genPromise: ToPromise<P, S, R>) 
       }))))
     .map((e: Action<P> & P) => (e.error ? e: {type: `${type}.resolved`, payload: e}))
 
-const signUpEpic = epicFromPromise("SIGN-UP", (x: Action<SignUpPayload>) =>
-  KiiUser.userWithUsername(x.payload.username, x.payload.password).register())
+const signUpEpic = epicFromPromise(
+  "SIGN-UP",
+  ({ payload: { username, password } }: Action<SignUpPayload>) =>
+    KiiUser.userWithUsername(username, password).register()
+)
 
-const signInEpic = epicFromPromise("SIGN-IN", (x: Action<SignInPayload>) =>
-  KiiUser.authenticate(x.payload.username, x.payload.password)
-    .then(u => u.memberOfGroups())
-    .then(([user, groups]) => ({user, groups}))
+const signInEpic = epicFromPromise(
+  "SIGN-IN",
+  ({ payload: { username, password } }: Action<SignInPayload>) =>
+    KiiUser.authenticate(username, password)
+      .then(u => u.memberOfGroups())
+      .then(([user, groups]) => ({user, groups}))
 )
 
 function join(token: string): Promise<{user: KiiUser, group: KiiGroup}> {
@@ -43,7 +48,10 @@ function join(token: string): Promise<{user: KiiUser, group: KiiGroup}> {
     .then(([user, group]) => ({user, group}))
 }
 
-const joinEpic = epicFromPromise('JOIN', (x: Action<JoinPayload>) => join(x.payload.github_token))
+const joinEpic = epicFromPromise(
+  'JOIN',
+  ({ payload }: Action<JoinPayload>) => join(payload.github_token)
+)
 
 function getMQTTEndpoint(sender: KiiUser): Promise<KiiMqttEndpoint> {
   const s = sender.pushInstallation();
@@ -99,8 +107,9 @@ function sendMessage(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Prom
   return topic.sendMessage(msg)
 }
 
-const sendStatusEpic = epicFromPromise("SEND-MESSAGE", (a: Action<SendMessagePayload>) =>
-  sendMessage(a.payload.topic, a.payload.status)
+const sendStatusEpic = epicFromPromise(
+  "SEND-MESSAGE",
+  ({ payload: { topic, status } }: Action<SendMessagePayload>) => sendMessage(topic, status)
 )
 
 //const messageArrivedEpic = epicFromPromise("MESSAGE-ARRIVED", (a: Action<KiiPushMessage>) =>
@@ -108,12 +117,14 @@ const sendStatusEpic = epicFromPromise("SEND-MESSAGE", (a: Action<SendMessagePay
 //    .then(u => u.getUsername())
 //)
 
-const connectEpic = epicFromPromise("CONNECT", (action: Action<ConnectPayload>, store: Redux.Store<any>) =>
-        getMQTTEndpoint(KiiUser.getCurrentUser()).then(endpoint =>
-          getTopic(action.payload, "status")
-            .then(topic => connectWS(endpoint, store)
-              .then(_ => ({topic}))
-            )))
+const connectEpic = epicFromPromise(
+  "CONNECT",
+  ({ payload }: Action<ConnectPayload>, store: Redux.Store<any>) =>
+    getMQTTEndpoint(KiiUser.getCurrentUser())
+      .then(endpoint => getTopic(payload, "status")
+        .then(topic => connectWS(endpoint, store)
+          .then(_ => ({topic}))))
+)
 
 import { connect } from "./action"
 
