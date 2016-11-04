@@ -111,6 +111,9 @@ export default class App extends React.Component<AppProps, any> {
 
   sendMessage(e: React.FormEvent<any>) {
     const { dispatch, kiicloud: { profile: { topic } } } = this.props;
+    if (!topic) {
+      return;
+    }
     dispatch(createAction("SEND-MESSAGE")({topic, status: {message: this.state.status}}))
     this.setState({status: ""});
   }

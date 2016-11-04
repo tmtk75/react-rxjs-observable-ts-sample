@@ -7,9 +7,11 @@ import {
   Kii, KiiUser, KiiGroup, KiiTopic, KiiPushMessageBuilder, KiiPushMessage, KiiMqttEndpoint,
 } from "kii-sdk"
 
-type ToPromise<P, S, R> = <P, S, R>(a: Action<P>, s: Redux.Store<S>) => Promise<R>
+namespace Epic {
 
-const epicFromPromise = <P, S, R>(type: string, genPromise: ToPromise<P, S, R>) =>
+  type ToPromise<P, S, R> = <P, S, R>(a: Action<P>, s: Redux.Store<S>) => Promise<R>
+
+  export const fromPromise = <P, S, R>(type: string, genPromise: ToPromise<P, S, R>) =>
   (a: ActionsObservable<P>, store: Redux.Store<S>) => a.ofType(type)
     .mergeMap(action => Rx.Observable.fromPromise(genPromise(action, store)
       .catch(err => ({
@@ -19,13 +21,15 @@ const epicFromPromise = <P, S, R>(type: string, genPromise: ToPromise<P, S, R>) 
       }))))
     .map((e: Action<P> & P) => (e.error ? e: {type: `${type}.resolved`, payload: e}))
 
-const signUpEpic = epicFromPromise(
+}
+
+const signUpEpic = Epic.fromPromise(
   "SIGN-UP",
   ({ payload: { username, password } }: Action<SignUpPayload>) =>
     KiiUser.userWithUsername(username, password).register()
 )
 
-const signInEpic = epicFromPromise(
+const signInEpic = Epic.fromPromise(
   "SIGN-IN",
   ({ payload: { username, password } }: Action<SignInPayload>) =>
     KiiUser.authenticate(username, password)
@@ -48,7 +52,7 @@ function join(token: string): Promise<{user: KiiUser, group: KiiGroup}> {
     .then(([user, group]) => ({user, group}))
 }
 
-const joinEpic = epicFromPromise(
+const joinEpic = Epic.fromPromise(
   'JOIN',
   ({ payload }: Action<JoinPayload>) => join(payload.github_token)
 )
@@ -107,7 +111,7 @@ function sendMessage(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Prom
   return topic.sendMessage(msg)
 }
 
-const sendStatusEpic = epicFromPromise(
+const sendStatusEpic = Epic.fromPromise(
   "SEND-MESSAGE",
   ({ payload: { topic, status } }: Action<SendMessagePayload>) => sendMessage(topic, status)
 )
@@ -117,7 +121,7 @@ const sendStatusEpic = epicFromPromise(
 //    .then(u => u.getUsername())
 //)
 
-const connectEpic = epicFromPromise(
+const connectEpic = Epic.fromPromise(
   "CONNECT",
   ({ payload }: Action<ConnectPayload>, store: Redux.Store<any>) =>
     getMQTTEndpoint(KiiUser.getCurrentUser())
