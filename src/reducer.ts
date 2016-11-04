@@ -26,13 +26,9 @@ const profile = handleActions({
 
   "CONNECT.resolved": (s: ProfileState, a: Action<{topic: KiiTopic}>) =>
     assign({}, s, a.payload),
-
 }, {} /* initial state */)
 
 const mqtt = handleActions({
-  "SIGN-OUT": (s: ProfileState, a: Action<KiiUser>) =>
-    assign({}, s, {client: null}),
-
   "CONNECTION-ALIVE": (s: MQTTState, a: Action<{endpoint: KiiMqttEndpoint, client: Paho.MQTT.Client}>) =>
     assign({}, s, a.payload),
 
@@ -47,13 +43,11 @@ const mqtt = handleActions({
 
   "CONNECT.end-retry": (s: MQTTState, a: Action<any>) =>
     assign({}, s, {retryCount: null}),
-
 }, {} /* initial state */)
 
 const message = handleActions({
-  "MESSAGE-ARRIVED":  (s: any, a: Action<any>) => {
-    return assign({}, s, a.payload);
-  },
+  "MESSAGE-ARRIVED":  (s: any, a: Action<any>) =>
+    assign({}, s, a.payload),
 }, {} /* initial state */)
 
 const rejected = (s: any = {}, a: Action<Error>) => {

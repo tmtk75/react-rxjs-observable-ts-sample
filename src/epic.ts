@@ -6,6 +6,7 @@ import * as Paho from "paho"
 import {
   Kii, KiiUser, KiiGroup, KiiTopic, KiiPushMessageBuilder, KiiPushMessage, KiiMqttEndpoint,
 } from "kii-sdk"
+import { connect, disconnect } from "./action"
 
 namespace Epic {
 
@@ -38,7 +39,7 @@ const signInEpic = Epic.fromPromise(
 )
 
 const signOutEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
-  a.ofType("SIGN-OUT").mapTo({type: "DISCONNECT"})
+  a.ofType("SIGN-OUT").map(_ => disconnect(store.getState().kiicloud))
 
 function join(token: string): Promise<{user: KiiUser, group: KiiGroup}> {
   return Kii.serverCodeEntry("join").execute({token})
@@ -133,11 +134,11 @@ const connectEpic = Epic.fromPromise(
           .then(_ => ({topic}))))
 )
 
-import { connect } from "./action"
-
 const connectionLostEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
   Rx.Observable.of(
-    a.ofType("CONNECTION-LOST").mapTo({type: "CONNECT.start-retry"}),
+    a.ofType("CONNECTION-LOST")
+      .filter(_ => !!store.getState().kiicloud.profile.user)
+      .mapTo({type: "CONNECT.start-retry"}),
 
     a.ofType("CONNECT.start-retry")
       .do(_ => console.group("CONNECT.retry"))
