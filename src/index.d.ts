@@ -1,5 +1,5 @@
 import * as Paho from "paho"
-import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint} from "kii-sdk"
+import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint } from "kii-sdk"
 
 declare global {
 
@@ -20,7 +20,9 @@ declare global {
      client: Paho.MQTT.Client,
      retryCount: number,
    }
+}
 
+declare global {
   type SendMessagePayload = {
     topic: KiiTopic,
     status: {

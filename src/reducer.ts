@@ -1,13 +1,15 @@
 import { handleActions, Action } from "redux-actions"
 import { combineReducers } from "redux"
+import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint } from "kii-sdk"
+import * as Paho from "paho"
 
 const assign = Object.assign;
 
 const profile = handleActions({
-  "SIGN-UP.resolved": (s: ProfileState, a: Action<any>) => {
+  "SIGN-UP.resolved": (s: ProfileState, a: Action<KiiUser>) => {
     return assign({}, s, {user: a.payload});
   },
-  "SIGN-IN.resolved": (s: ProfileState, a: Action<any>) => {
+  "SIGN-IN.resolved": (s: ProfileState, a: Action<{user: KiiUser, groups: Array<KiiGroup>}>) => {
     const { user, groups } = a.payload;
     return assign({}, s, {
       user,
@@ -15,16 +17,16 @@ const profile = handleActions({
       groups,
     });
   },
-  "JOIN.resolved": (s: ProfileState, a: Action<any>) => {
+  "JOIN.resolved": (s: ProfileState, a: Action<{user: KiiUser, group: KiiGroup}>) => {
     return assign({}, s, a.payload);
   },
-  "CONNECT.resolved": (s: ProfileState, a: Action<any>) => {
+  "CONNECT.resolved": (s: ProfileState, a: Action<{topic: KiiTopic}>) => {
     return assign({}, s, a.payload);
   },
 }, {} /* initial state */)
 
 const mqtt = handleActions({
-  "CONNECTION-ALIVE": (s: MQTTState, a: Action<any>) => {
+  "CONNECTION-ALIVE": (s: MQTTState, a: Action<{endpoint: KiiMqttEndpoint, client: Paho.MQTT.Client}>) => {
     return assign({}, s, a.payload);
   },
   "CONNECTION-LOST": (s: MQTTState, a: Action<any>) => {

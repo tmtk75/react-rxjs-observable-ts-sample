@@ -53,6 +53,7 @@ declare module "kii-sdk" {
 
   export class KiiPushMessage {
     senderURI: string;
+    value: string;
   }
 
   export class KiiPushMessageBuilder {

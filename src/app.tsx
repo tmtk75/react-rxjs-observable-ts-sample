@@ -6,11 +6,12 @@ import {
   connect,
   disconnect,
 } from "./action"
+import { KiiPushMessage } from "kii-sdk"
 
 type AppProps = {
   dispatch: Dispatch<any>,
   kiicloud: KiiCloudState,
-  message: any,
+  message: KiiPushMessage,
 }
 
 type AppState = {
