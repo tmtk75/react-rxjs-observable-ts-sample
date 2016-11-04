@@ -6,9 +6,9 @@ import * as Paho from "paho"
 const assign = Object.assign;
 
 const profile = handleActions({
-  "SIGN-UP.resolved": (s: ProfileState, a: Action<KiiUser>) => {
-    return assign({}, s, {user: a.payload, group: null});
-  },
+  "SIGN-UP.resolved": (s: ProfileState, a: Action<KiiUser>) =>
+    assign({}, s, {user: a.payload, group: null}),
+
   "SIGN-IN.resolved": (s: ProfileState, a: Action<{user: KiiUser, groups: Array<KiiGroup>}>) => {
     const { user, groups } = a.payload;
     return assign({}, s, {
@@ -17,33 +17,37 @@ const profile = handleActions({
       groups,
     });
   },
-  "SIGN-OUT": (s: ProfileState, a: Action<KiiUser>) => {
-    return assign({}, s, {user: null});
-  },
-  "JOIN.resolved": (s: ProfileState, a: Action<{user: KiiUser, group: KiiGroup}>) => {
-    return assign({}, s, a.payload);
-  },
-  "CONNECT.resolved": (s: ProfileState, a: Action<{topic: KiiTopic}>) => {
-    return assign({}, s, a.payload);
-  },
+
+  "SIGN-OUT": (s: ProfileState, a: Action<KiiUser>) =>
+    assign({}, s, {user: null}),
+
+  "JOIN.resolved": (s: ProfileState, a: Action<{user: KiiUser, group: KiiGroup}>) =>
+    assign({}, s, a.payload),
+
+  "CONNECT.resolved": (s: ProfileState, a: Action<{topic: KiiTopic}>) =>
+    assign({}, s, a.payload),
+
 }, {} /* initial state */)
 
 const mqtt = handleActions({
-  "CONNECTION-ALIVE": (s: MQTTState, a: Action<{endpoint: KiiMqttEndpoint, client: Paho.MQTT.Client}>) => {
-    return assign({}, s, a.payload);
-  },
-  "CONNECTION-LOST": (s: MQTTState, a: Action<any>) => {
-    return assign({}, s, {endpoint: null, client: null});
-  },
-  "CONNECT.start-retry": (s: MQTTState, a: Action<any>) => {
-    return assign({}, s, {retryCount: 0});
-  },
-  "CONNECT.retry": (s: MQTTState, a: Action<any>) => {
-    return assign({}, s, {retryCount: s.retryCount + 1});
-  },
-  "CONNECT.end-retry": (s: MQTTState, a: Action<any>) => {
-    return assign({}, s, {retryCount: null});
-  },
+  "SIGN-OUT": (s: ProfileState, a: Action<KiiUser>) =>
+    assign({}, s, {client: null}),
+
+  "CONNECTION-ALIVE": (s: MQTTState, a: Action<{endpoint: KiiMqttEndpoint, client: Paho.MQTT.Client}>) =>
+    assign({}, s, a.payload),
+
+  "CONNECTION-LOST": (s: MQTTState, a: Action<any>) =>
+    assign({}, s, {endpoint: null, client: null}),
+
+  "CONNECT.start-retry": (s: MQTTState, a: Action<any>) =>
+    assign({}, s, {retryCount: 0}),
+
+  "CONNECT.retry": (s: MQTTState, a: Action<any>) =>
+    assign({}, s, {retryCount: s.retryCount + 1}),
+
+  "CONNECT.end-retry": (s: MQTTState, a: Action<any>) =>
+    assign({}, s, {retryCount: null}),
+
 }, {} /* initial state */)
 
 const message = handleActions({
@@ -56,7 +60,7 @@ const rejected = (s: any = {}, a: Action<Error>) => {
   if (a.type.match(/\.rejected$/)) {
     console.error(a.type, a.payload);
   }
-  return assign({}, s, {payload: a.payload});
+  return s;
 }
 
 export const reducer = combineReducers({

@@ -12,14 +12,14 @@ namespace Epic {
   type ToPromise<P, S, R> = <P, S, R>(a: Action<P>, s: Redux.Store<S>) => Promise<R>
 
   export const fromPromise = <P, S, R>(type: string, genPromise: ToPromise<P, S, R>) =>
-  (a: ActionsObservable<P>, store: Redux.Store<S>) => a.ofType(type)
-    .mergeMap(action => Rx.Observable.fromPromise(genPromise(action, store)
-      .catch(err => ({
-        type: `${type}.rejected`,
-        payload: err,
-        error: true,
-      }))))
-    .map((e: Action<P> & P) => (e.error ? e: {type: `${type}.resolved`, payload: e}))
+    (a: ActionsObservable<P>, store: Redux.Store<S>) => a.ofType(type)
+      .mergeMap(action => Rx.Observable.fromPromise(genPromise(action, store)
+        .catch(err => ({
+          type: `${type}.rejected`,
+          payload: err,
+          error: true,
+        }))))
+      .map((e: Action<P> & P) => (e.error ? e: {type: `${type}.resolved`, payload: e}))
 
 }
 
@@ -36,6 +36,9 @@ const signInEpic = Epic.fromPromise(
       .then(u => u.memberOfGroups())
       .then(([user, groups]) => ({user, groups}))
 )
+
+const signOutEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
+  a.ofType("SIGN-OUT").mapTo({type: "DISCONNECT"})
 
 function join(token: string): Promise<{user: KiiUser, group: KiiGroup}> {
   return Kii.serverCodeEntry("join").execute({token})
@@ -175,6 +178,7 @@ export const rootEpic = combineEpics(
   combineEpics(
     signUpEpic,
     signInEpic,
+    signOutEpic,
   ),
   connectionLostEpic,
 );
