@@ -64,6 +64,11 @@ export default class App extends React.Component<AppProps, any> {
             password: this.state.password,
           }))}
           />
+        <FlatButton
+          label="sign out"
+          disabled={!user}
+          onClick={_ => dispatch(createAction("SIGN-OUT")())}
+          />
         <TextField
           name="github_token"
           floatingLabelText="github_token"

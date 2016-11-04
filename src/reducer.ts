@@ -17,6 +17,9 @@ const profile = handleActions({
       groups,
     });
   },
+  "SIGN-OUT": (s: ProfileState, a: Action<KiiUser>) => {
+    return assign({}, s, {user: null});
+  },
   "JOIN.resolved": (s: ProfileState, a: Action<{user: KiiUser, group: KiiGroup}>) => {
     return assign({}, s, a.payload);
   },
@@ -49,11 +52,11 @@ const message = handleActions({
   },
 }, {} /* initial state */)
 
-const rejected = (s: any = {}, a: Action<any>) => {
+const rejected = (s: any = {}, a: Action<Error>) => {
   if (a.type.match(/\.rejected$/)) {
     console.error(a.type, a.payload);
   }
-  return s;
+  return assign({}, s, {payload: a.payload});
 }
 
 export const reducer = combineReducers({
@@ -62,6 +65,8 @@ export const reducer = combineReducers({
     mqtt,
   }),
   message,
-  rejected,
+  error: combineReducers({
+    rejected,
+  }),
 })
 
