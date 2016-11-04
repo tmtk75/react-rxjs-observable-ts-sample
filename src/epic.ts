@@ -7,17 +7,17 @@ import {
   Kii, KiiUser, KiiGroup, KiiTopic, KiiPushMessageBuilder, KiiPushMessage, KiiMqttEndpoint,
 } from "kii-sdk"
 
-type ToPromise = (x: Action<any>, s: Redux.Store<any>) => Promise<any>
+type ToPromise<P, S, R> = <P, S, R>(a: Action<P>, s: Redux.Store<S>) => Promise<R>
 
-const epicFromPromise = (type: string, genPromise: ToPromise) =>
-  (a: ActionsObservable<any>, store: Redux.Store<any>) => a.ofType(type)
+const epicFromPromise = <P, S, R>(type: string, genPromise: ToPromise<P, S, R>) =>
+  (a: ActionsObservable<P>, store: Redux.Store<S>) => a.ofType(type)
     .mergeMap(action => Rx.Observable.fromPromise(genPromise(action, store)
       .catch(err => ({
         type: `${type}.rejected`,
         payload: err,
         error: true,
       }))))
-    .map((payload: any) => (payload.error ? payload : {type: `${type}.resolved`, payload}))
+    .map((e: Action<P> & P) => (e.error ? e: {type: `${type}.resolved`, payload: e}))
 
 const signUpEpic = epicFromPromise("SIGN-UP", (x: Action<SignUpPayload>) =>
   KiiUser.userWithUsername(x.payload.username, x.payload.password).register())

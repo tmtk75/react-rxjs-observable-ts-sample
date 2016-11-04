@@ -4,10 +4,10 @@ import { combineReducers } from "redux"
 const assign = Object.assign;
 
 const profile = handleActions({
-  "SIGN-UP.resolved": (s: any, a: Action<any>) => {
+  "SIGN-UP.resolved": (s: ProfileState, a: Action<any>) => {
     return assign({}, s, {user: a.payload});
   },
-  "SIGN-IN.resolved": (s: any, a: Action<any>) => {
+  "SIGN-IN.resolved": (s: ProfileState, a: Action<any>) => {
     const { user, groups } = a.payload;
     return assign({}, s, {
       user,
@@ -15,10 +15,10 @@ const profile = handleActions({
       groups,
     });
   },
-  "JOIN.resolved": (s: any, a: Action<any>) => {
+  "JOIN.resolved": (s: ProfileState, a: Action<any>) => {
     return assign({}, s, a.payload);
   },
-  "CONNECT.resolved": (s: any, a: Action<any>) => {
+  "CONNECT.resolved": (s: ProfileState, a: Action<any>) => {
     return assign({}, s, a.payload);
   },
 }, {} /* initial state */)

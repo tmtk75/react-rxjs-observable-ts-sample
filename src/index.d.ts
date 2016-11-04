@@ -4,13 +4,15 @@ import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint} from "kii-sdk"
 declare global {
 
   type KiiCloudState = {
-      profile: {
-        user: KiiUser,
-        group: KiiGroup,
-        groups: Array<KiiGroup>,
-        topic: KiiTopic,
-      },
+      profile: ProfileState,
       mqtt: MQTTState,
+  }
+
+  type ProfileState = {
+    user: KiiUser,
+    group: KiiGroup,
+    groups: Array<KiiGroup>,
+    topic: KiiTopic,
   }
 
   type MQTTState = {
