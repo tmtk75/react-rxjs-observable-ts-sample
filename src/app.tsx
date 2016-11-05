@@ -162,7 +162,7 @@ class Member extends React.Component<AppProps, {}> {
           onClick={_ => dispatch(createAction("LOAD-MEMBERS")(group))}
           />
         <ul>{
-          members.map(e => <li key={e.getUUID()}>uuid: {e.getUUID()}</li>)
+          members.map(e => <li key={e.getUUID()}>{e.getUsername()}</li>)
         }</ul>
       </div>
     )
