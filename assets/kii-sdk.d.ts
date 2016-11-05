@@ -5,8 +5,12 @@ declare module "kii-sdk" {
     static serverCodeEntry(name: string): KiiServerCodeEntry;
   }
 
+  class KiiServerCodeExecResult {
+    getReturnedValue(): {returnedValue: any};
+  }
+
   export class KiiServerCodeEntry {
-    execute(arg: Object): Promise<any>;
+    execute(arg: Object): Promise<[string /*entry*/, Object /*args*/, KiiServerCodeExecResult]>;
   }
 
   export class KiiGroup {
