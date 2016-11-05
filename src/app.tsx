@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Dispatch } from "redux"
-import { createAction } from "redux-actions"
+import { createAction, Action } from "redux-actions"
 import { FlatButton, TextField } from "material-ui"
 import {
   connect,
@@ -9,9 +9,10 @@ import {
 import { KiiPushMessage } from "kii-sdk"
 
 type AppProps = {
-  dispatch: Dispatch<any>,
+  dispatch: Dispatch<Action<any>>,
   kiicloud: KiiCloudState,
   message: KiiPushMessage,
+  github_token: string,
 }
 
 type LoginState = {
@@ -20,7 +21,7 @@ type LoginState = {
 }
 
 class Login extends React.Component<AppProps, LoginState> {
-  constructor(props: any) {
+  constructor(props: AppProps) {
     super(props);
     this.state = {
       username: "tmtk75",
@@ -73,7 +74,7 @@ class Login extends React.Component<AppProps, LoginState> {
 }
 
 class Connect extends React.Component<AppProps, {github_token: string}> {
-  constructor(props: any) {
+  constructor(props: AppProps) {
     super(props);
     this.state = {
       github_token: props.github_token,
@@ -138,7 +139,7 @@ class Message extends React.Component<AppProps, {status: string}> {
       </div>
     )
   }
-  sendMessage(e: React.FormEvent<any>) {
+  sendMessage(e: React.FormEvent<TextField & FlatButton> | React.KeyboardEvent<{}>) {
     const { dispatch, kiicloud: { profile: { topic } } } = this.props;
     if (!topic) {
       return;

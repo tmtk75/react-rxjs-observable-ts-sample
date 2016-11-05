@@ -38,7 +38,7 @@ const signInEpic = Epic.fromPromise(
       .then(([user, groups]) => ({user, groups}))
 )
 
-const signOutEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
+const signOutEpic = (a: ActionsObservable<{}>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
   a.ofType("SIGN-OUT").map(_ => disconnect(store.getState().kiicloud))
 
 function join(token: string): Promise<{user: KiiUser, group: KiiGroup}> {
@@ -102,7 +102,7 @@ function connectWS(ep: KiiMqttEndpoint, store: Redux.Store<{kiicloud: KiiCloudSt
   })
 }
 
-function sendMessage(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Promise<any> {
+function sendMessage(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Promise<{}> {
   const data = {value: JSON.stringify(m)};
   const msg = new KiiPushMessageBuilder(data).build()
   return topic.sendMessage(msg)
@@ -120,14 +120,14 @@ const sendStatusEpic = Epic.fromPromise(
 
 const connectEpic = Epic.fromPromise(
   "CONNECT",
-  ({ payload }: Action<ConnectPayload>, store: Redux.Store<any>) =>
+  ({ payload }: Action<ConnectPayload>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
     getMQTTEndpoint(KiiUser.getCurrentUser())
       .then(endpoint => getTopic(payload, "status")
         .then(topic => connectWS(endpoint, store)
           .then(_ => ({topic}))))
 )
 
-const connectionLostEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
+const connectionLostEpic = (a: ActionsObservable<{}>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
   Rx.Observable.of(
     a.ofType("CONNECTION-LOST")
       .filter(_ => !!store.getState().kiicloud.profile.user)
