@@ -6,13 +6,17 @@ import {
   connect,
   disconnect,
 } from "./action"
-import { KiiPushMessage } from "kii-sdk"
+import { KiiUser, KiiPushMessage } from "kii-sdk"
 
 type AppProps = {
   dispatch: Dispatch<Action<any>>,
   kiicloud: KiiCloudState,
   message: KiiPushMessage,
+  members: MembersState,
   github_token: string,
+  error: {
+    rejected: Error,
+  },
 }
 
 type LoginState = {
@@ -164,7 +168,11 @@ class Member extends React.Component<AppProps, {}> {
           />
         {group ? ` for ${group.getName()}` : null}
         <ul>{
-          members.map(e => <li key={e.getUUID()}>{e.getUsername()}</li>)
+          members.map(e =>
+            <li key={e.getUUID()}>
+              {e.getUsername()}
+            </li>
+          )
         }</ul>
       </div>
     )
@@ -176,12 +184,26 @@ class Debug extends React.Component<AppProps, {}> {
     super(props);
   }
   render() {
-    const { kiicloud: { profile: { user, group } }, message: { value } } = this.props;
+    const {
+      kiicloud: { profile: { user, group } },
+      message, message: { value },
+      members,
+      error: { rejected }
+    } = this.props;
+
+    let sender: KiiUser;
+    if (message && members) {
+      sender = members[message.sender];
+    }
     return (
       <div>
         <div>user: {user ? user.getUsername() : null}</div>
         <div>group: {group ? group.getName() : null}</div>
-        <div>received-message: {value ? value.toString() : null}</div>
+        <div>
+          received-message: {value ? value.toString() : null}
+          {sender ? " by " + sender.getUsername() : null}
+        </div>
+        <div>error: {rejected ? rejected.message : null}</div>
       </div>
     )
   }

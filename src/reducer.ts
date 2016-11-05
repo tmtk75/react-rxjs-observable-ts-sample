@@ -53,9 +53,25 @@ const message = handleActions({
     assign({}, s, a.payload),
 }, {} /* initial state */)
 
-const rejected = (s: any = {}, a: Action<Error>) => {
+function asMap(a: Array<KiiUser>): {[userId: string]: KiiPushMessage} {
+  const m = Object.create(null);
+  a.forEach(u => {
+    m[u.getUUID()] = u;
+  });
+  return m;
+}
+
+const members = handleActions({
+  "LOAD-MEMBERS.resolved":  (s: MembersState, a: Action<Array<KiiUser>>) =>
+    assign({}, s, asMap(a.payload)),
+}, {} /* initial state */)
+
+const error = (s: any = {}, a: Action<Error>) => {
   if (a.type.match(/\.rejected$/)) {
     console.error(a.type, a.payload);
+    return assign({}, s, {rejected: a.payload});
+  } else if (a.type.match(/\.resolved/)) {
+    return assign({}, s, {rejected: null});
   }
   return s;
 }
@@ -66,8 +82,7 @@ export const reducer = combineReducers({
     mqtt,
   }),
   message,
-  error: combineReducers({
-    rejected,
-  }),
+  members,
+  error,
 })
 

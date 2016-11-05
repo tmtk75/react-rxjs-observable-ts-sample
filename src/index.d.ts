@@ -23,6 +23,8 @@ declare global {
      readonly retryCount: number,
   }
 
+  type MembersState = {[userId: string]: KiiUser};
+
   type SendMessagePayload = {
     topic: KiiTopic,
     status: {
