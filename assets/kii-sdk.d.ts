@@ -60,8 +60,8 @@ declare module "kii-sdk" {
   }
 
   export class KiiPushMessage {
-    senderURI: string;
-    value: string;
+    readonly senderURI: string;
+    readonly value: string;
   }
 
   export class KiiPushMessageBuilder {
@@ -70,11 +70,11 @@ declare module "kii-sdk" {
   }
 
   export interface KiiMqttEndpoint {
-    host: string;
-    portWS: number;
-    username: string;
-    password: string;
-    mqttTopic: string;
+    readonly host: string;
+    readonly portWS: number;
+    readonly username: string;
+    readonly password: string;
+    readonly mqttTopic: string;
   }
 
 }
