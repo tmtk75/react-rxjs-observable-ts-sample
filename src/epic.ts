@@ -83,8 +83,8 @@ function connectWS(ep: KiiMqttEndpoint, store: Redux.Store<{kiicloud: KiiCloudSt
   }
 
   const client = new Paho.MQTT.Client(ep.host, ep.portWS, ep.mqttTopic);
-  client.onConnectionLost = (res) => store.dispatch({type: "CONNECTION-LOST", payload: res});
-  client.onMessageArrived = (msg) => store.dispatch({type: "MESSAGE-ARRIVED", payload: JSON.parse(msg.payloadString)});
+  client.onConnectionLost = res => store.dispatch({type: "CONNECTION-LOST", payload: res});
+  client.onMessageArrived = msg => store.dispatch({type: "MESSAGE-ARRIVED", payload: JSON.parse(msg.payloadString)});
   return new Promise((resolve, reject) => {
     client.connect({
       userName: ep.username,

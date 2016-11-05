@@ -36,7 +36,7 @@ class Login extends React.Component<AppProps, LoginState> {
           floatingLabelText="username"
           style={{width: '48%'}}
           value={this.state.username}
-          onChange={(e: React.FormEvent<TextField>) => this.setState({username: (e.target as any).value})}
+          onChange={(e: React.FormEvent<TextField>) => this.setState({username: e.target.getValue()})}
           />
         <TextField
           type="password"
@@ -44,7 +44,7 @@ class Login extends React.Component<AppProps, LoginState> {
           floatingLabelText="password"
           style={{width: '48%'}}
           value={this.state.password}
-          onChange={(e: React.FormEvent<TextField>) => this.setState({password: (e.target as any).value})}
+          onChange={(e: React.FormEvent<TextField>) => this.setState({password: e.target.getValue()})}
           />
         <FlatButton
           label="sign up"
@@ -88,7 +88,7 @@ class Connect extends React.Component<AppProps, {github_token: string}> {
           floatingLabelText="github_token"
           fullWidth={true}
           value={this.state.github_token}
-          onChange={(e: React.FormEvent<TextField>) => this.setState({github_token: (e.target as any).value})}
+          onChange={(e: React.FormEvent<TextField>) => this.setState({github_token: e.target.getValue()})}
           />
         <FlatButton
           label="join"
@@ -127,7 +127,7 @@ class Message extends React.Component<AppProps, {status: string}> {
           name="status"
           floatingLabelText="status"
           value={this.state.status}
-          onChange={(e: React.FormEvent<TextField>) => this.setState({status: (e.target as any).value})}
+          onChange={(e: React.FormEvent<TextField>) => this.setState({status: e.target.getValue()})}
           onKeyDown={e => e.keyCode === 13 ? this.sendMessage(e) : null}
           />
         <FlatButton

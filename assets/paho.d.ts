@@ -7,12 +7,21 @@ declare module "paho" {
       onFailure: (err: Error) => void,
     };
 
+    type ErrorResponse = {
+      errorCode: number,
+      errorMessage: string,
+    }
+
+    type Message = {
+      readonly payloadString: string,
+    }
+
     export class Client {
       constructor(host: string, port: number, topic: string);
       subscribe(topic: string): void;
       connect(args: connArgs): void;
-      onConnectionLost: (a: any) => void;
-      onMessageArrived: (a: any) => void;
+      onConnectionLost: (res: ErrorResponse) => void;
+      onMessageArrived: (msg: Message) => void;
       disconnect(): void;
     }
   }
