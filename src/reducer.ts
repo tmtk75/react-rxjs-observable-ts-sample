@@ -2,6 +2,7 @@ import { handleActions, Action } from "redux-actions"
 import { combineReducers } from "redux"
 import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint, KiiPushMessage } from "kii-sdk"
 import * as Paho from "paho"
+import { Map } from "immutable"
 
 const assign = Object.assign;
 
@@ -48,23 +49,18 @@ const mqtt = handleActions({
     assign({}, s, {retryCount: null}),
 }, {} /* initial state */)
 
-const message = handleActions({
-  "MESSAGE-ARRIVED":  (s: any, a: Action<KiiPushMessage>) =>
-    assign({}, s, a.payload),
-}, {} /* initial state */)
-
-function asMap(a: Array<KiiUser>): {[userId: string]: KiiPushMessage} {
-  const m = Object.create(null);
-  a.forEach(u => {
-    m[u.getUUID()] = u;
-  });
-  return m;
-}
+const messages = handleActions({
+  "MESSAGE-ARRIVED":  (s: MessagesState, { payload }: Action<KiiPushMessage>) =>
+    assign({}, s, {
+      last: payload,
+      pushMessages: s.pushMessages.set(payload.sender, JSON.parse(payload.value).message),
+    }),
+}, {last: {}, pushMessages: Map()} /* initial state */)
 
 const members = handleActions({
   "LOAD-MEMBERS.resolved":  (s: MembersState, a: Action<Array<KiiUser>>) =>
-    assign({}, s, asMap(a.payload)),
-}, {} /* initial state */)
+    assign({}, s, {users: Map(a.payload.map(u => [u.getUUID(), u]))}),
+}, {users: Map()} /* initial state */)
 
 const error = (s: any = {}, a: Action<Error>) => {
   if (a.type.match(/\.rejected$/)) {
@@ -81,7 +77,7 @@ export const reducer = combineReducers({
     profile,
     mqtt,
   }),
-  message,
+  messages,
   members,
   error,
 })

@@ -11,7 +11,7 @@ import { KiiUser, KiiPushMessage } from "kii-sdk"
 type AppProps = {
   dispatch: Dispatch<Action<any>>,
   kiicloud: KiiCloudState,
-  message: KiiPushMessage,
+  messages: MessagesState,
   members: MembersState,
   github_token: string,
   error: {
@@ -125,12 +125,13 @@ class Message extends React.Component<AppProps, {status: string}> {
     }
   }
   render() {
-    const { dispatch, kiicloud: { profile: { user, group }, mqtt: { client } }, message: { value } } = this.props;
+    const { dispatch, kiicloud: { profile: { user, group }, mqtt: { client } } } = this.props;
     return (
       <div>
         <TextField
           name="status"
           floatingLabelText="status"
+          errorText={!!this.state.status && !client ? "not connected" : null}
           value={this.state.status}
           onChange={(e: React.FormEvent<TextField>) => this.setState({status: (e.target as any).value})}
           onKeyDown={e => e.keyCode === 13 ? this.sendMessage(e) : null}
@@ -158,7 +159,7 @@ class Member extends React.Component<AppProps, {}> {
     super(props)
   }
   render() {
-    const { dispatch, kiicloud: { profile: { group, members } } } = this.props;
+    const { dispatch, kiicloud: { profile: { group, members } }, messages: { pushMessages } } = this.props;
     return (
       <div>
         <FlatButton
@@ -170,7 +171,7 @@ class Member extends React.Component<AppProps, {}> {
         <ul>{
           members.map(e =>
             <li key={e.getUUID()}>
-              {e.getUsername()}
+              {e.getUsername()}: {pushMessages.get(e.getUUID())}
             </li>
           )
         }</ul>
@@ -186,21 +187,25 @@ class Debug extends React.Component<AppProps, {}> {
   render() {
     const {
       kiicloud: { profile: { user, group } },
-      message, message: { value },
+      messages: {
+        last,
+        last: { value },
+        pushMessages,
+      },
       members,
       error: { rejected }
     } = this.props;
 
     let sender: KiiUser;
-    if (message && members) {
-      sender = members[message.sender];
+    if (last && members) {
+      sender = members.users.get(last.sender);
     }
     return (
       <div>
         <div>user: {user ? user.getUsername() : null}</div>
         <div>group: {group ? group.getName() : null}</div>
         <div>
-          received-message: {value ? value.toString() : null}
+          last-message: {value ? value.toString() : null}
           {sender ? " by " + sender.getUsername() : null}
         </div>
         <div>error: {rejected ? rejected.message : null}</div>

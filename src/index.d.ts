@@ -1,6 +1,7 @@
 import * as Paho from "paho"
-import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint } from "kii-sdk"
+import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint, KiiPushMessage } from "kii-sdk"
 import { StoreCreator } from "redux"
+import { Map } from "immutable"
 
 declare global {
 
@@ -23,7 +24,17 @@ declare global {
      readonly retryCount: number,
   }
 
-  type MembersState = {[userId: string]: KiiUser};
+  type UserID = string;
+  type StatusText = string;
+
+  type MessagesState = {
+    readonly last: KiiPushMessage,
+    readonly pushMessages: Map<UserID, StatusText>,
+  };
+
+  type MembersState = {
+    users: Map<UserID, KiiUser>;
+  }
 
   type SendMessagePayload = {
     topic: KiiTopic,
