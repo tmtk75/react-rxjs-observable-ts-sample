@@ -50,12 +50,13 @@ declare module "kii-sdk" {
   }
 
   export class KiiPushInstallation {
-    installMqtt(dev: boolean): Promise<any>;
-    getMqttEndpoint(instID: string): Promise<any>;
+    installMqtt(dev: boolean): Promise<{installationID: string}>;
+    getMqttEndpoint(instID: string): Promise<KiiMqttEndpoint>;
   }
 
   export class KiiPushSubscription {
-    isSubscribed(t: KiiTopic): Promise<any>;
+    isSubscribed(t: KiiTopic): Promise<[KiiPushSubscription, KiiTopic, boolean]>;
+    subscribe(t: KiiTopic): Promise<any>
   }
 
   export class KiiPushMessage {
