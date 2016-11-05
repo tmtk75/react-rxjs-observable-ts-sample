@@ -1,5 +1,6 @@
 import * as Paho from "paho"
 import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint } from "kii-sdk"
+import { StoreCreator } from "redux"
 
 declare global {
   type KiiCloudState = {
@@ -48,4 +49,10 @@ declare module "redux-actions" {
   type actionMap = {[key: string]: any}
 
   export function createActions(actions: actionMap, ...keys: string[]): any;
+}
+
+declare global {
+  interface Window {
+    devToolsExtension(): StoreCreator;
+  }
 }

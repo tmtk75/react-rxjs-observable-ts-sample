@@ -18,7 +18,7 @@ import { rootEpic } from "./epic"
 import { reducer } from "./reducer"
 
 //
-const devtools = (window as any).devToolsExtension && (window as any).devToolsExtension()
+const devtools = window.devToolsExtension && window.devToolsExtension()
 const middlewares = applyMiddleware(
   createEpicMiddleware(rootEpic),
 )
