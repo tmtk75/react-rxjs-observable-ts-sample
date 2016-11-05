@@ -15,10 +15,10 @@ declare module "kii-sdk" {
 
   export class KiiGroup {
     static groupWithID(id: string): KiiGroup;
-    static registerGroupWithID(id: string, name: string, opts: any): Promise<KiiGroup>;
+    static registerGroupWithID(id: string, name: string, members: Array<KiiUser>): Promise<KiiGroup>;
     refresh(): Promise<KiiGroup>;
     getName(): string;
-    listTopics(): Promise<any>;
+    listTopics(): Promise<[Array<KiiTopic>, string /*paginationKey*/]>;
     topicWithName(name: string): KiiTopic;
     save(): Promise<KiiGroup>;
     addUser(u: KiiUser): void;
@@ -38,9 +38,9 @@ declare module "kii-sdk" {
     getUUID(): string;
     getAccessToken(): string;
     getUsername(): string;
-    pushInstallation(): KiiPushSubscription;
+    pushInstallation(): KiiPushInstallation;
     pushSubscription(): KiiPushSubscription;
-    memberOfGroups(): Promise<any>;
+    memberOfGroups(): Promise<[KiiUser, Array<KiiGroup>]>;
   }
 
   export class KiiTopic {
@@ -49,9 +49,12 @@ declare module "kii-sdk" {
     getName(): string;
   }
 
-  export class KiiPushSubscription {
+  export class KiiPushInstallation {
     installMqtt(dev: boolean): Promise<any>;
     getMqttEndpoint(instID: string): Promise<any>;
+  }
+
+  export class KiiPushSubscription {
     isSubscribed(t: KiiTopic): Promise<any>;
   }
 
