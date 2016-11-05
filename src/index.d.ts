@@ -9,11 +9,11 @@ declare global {
   }
 
   type ProfileState = {
-    readonly user: KiiUser,
-    readonly group: KiiGroup,
-    readonly groups: Array<KiiGroup>,
-    readonly topic: KiiTopic,
-    readonly members: Array<KiiUser>,
+    readonly user?: KiiUser,
+    readonly group?: KiiGroup,
+    readonly groups?: Array<KiiGroup>,
+    readonly topic?: KiiTopic,
+    readonly members?: Array<KiiUser>,
   }
 
   type MQTTState = {

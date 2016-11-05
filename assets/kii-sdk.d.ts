@@ -60,12 +60,19 @@ declare module "kii-sdk" {
   }
 
   export class KiiPushMessage {
-    readonly senderURI: string;
-    readonly value: string;
+    objectScopeGroupID: string; // 'kiicorp'
+    sender:             string; // '3639fcbfbba0-e…87f4'
+    sourceURI:          string; // 'kiicloud://gro…atus'
+    objectScopeType:    string; // 'APP_AND_GROUP'
+    topic:              string; // 'status'
+    objectScopeAppID:   string; // '2cdc6549'
+    senderURI:          string; // 'kiicloud://use…87f4'
+    value:              string; // '{"message":"asdf"}'
+    when:               number; // 1478324740503
   }
 
   export class KiiPushMessageBuilder {
-    constructor(a: any);
+    constructor(a: Object | string | number);
     build(): KiiPushMessage;
   }
 

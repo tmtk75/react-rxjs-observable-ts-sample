@@ -1,6 +1,6 @@
 import { handleActions, Action } from "redux-actions"
 import { combineReducers } from "redux"
-import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint } from "kii-sdk"
+import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint, KiiPushMessage } from "kii-sdk"
 import * as Paho from "paho"
 
 const assign = Object.assign;
@@ -18,7 +18,7 @@ const profile = handleActions({
     });
   },
 
-  "SIGN-OUT": (s: ProfileState, a: Action<KiiUser>) =>
+  "SIGN-OUT": (s: ProfileState, a: Action<{} /* NOTE: this should be as-is. If not, type error happens */>) =>
     assign({}, s, {user: null}),
 
   "JOIN.resolved": (s: ProfileState, a: Action<{user: KiiUser, group: KiiGroup}>) =>
@@ -27,7 +27,7 @@ const profile = handleActions({
   "CONNECT.resolved": (s: ProfileState, a: Action<{topic: KiiTopic}>) =>
     assign({}, s, a.payload),
 
-  "LOAD-MEMBERS.resolved": (s: any, a: Action<any>) =>
+  "LOAD-MEMBERS.resolved": (s: ProfileState, a: Action<Array<KiiUser>>) =>
     assign({}, s, {members: a.payload}),
 }, {members: []} /* initial state */)
 
@@ -35,21 +35,21 @@ const mqtt = handleActions({
   "CONNECTION-ALIVE": (s: MQTTState, a: Action<{endpoint: KiiMqttEndpoint, client: Paho.MQTT.Client}>) =>
     assign({}, s, a.payload),
 
-  "CONNECTION-LOST": (s: MQTTState, a: Action<any>) =>
+  "CONNECTION-LOST": (s: MQTTState, a: Action<{}>) =>
     assign({}, s, {endpoint: null, client: null}),
 
-  "CONNECT.start-retry": (s: MQTTState, a: Action<any>) =>
+  "CONNECT.start-retry": (s: MQTTState, a: Action<{}>) =>
     assign({}, s, {retryCount: 0}),
 
-  "CONNECT.retry": (s: MQTTState, a: Action<any>) =>
+  "CONNECT.retry": (s: MQTTState, a: Action<{}>) =>
     assign({}, s, {retryCount: s.retryCount + 1}),
 
-  "CONNECT.end-retry": (s: MQTTState, a: Action<any>) =>
+  "CONNECT.end-retry": (s: MQTTState, a: Action<{}>) =>
     assign({}, s, {retryCount: null}),
 }, {} /* initial state */)
 
 const message = handleActions({
-  "MESSAGE-ARRIVED":  (s: any, a: Action<any>) =>
+  "MESSAGE-ARRIVED":  (s: any, a: Action<KiiPushMessage>) =>
     assign({}, s, a.payload),
 }, {} /* initial state */)
 
