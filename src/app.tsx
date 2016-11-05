@@ -161,6 +161,7 @@ class Member extends React.Component<AppProps, {}> {
           disabled={!group}
           onClick={_ => dispatch(createAction("LOAD-MEMBERS")(group))}
           />
+        {group ? ` for ${group.getName()}` : null}
         <ul>{
           members.map(e => <li key={e.getUUID()}>{e.getUsername()}</li>)
         }</ul>
