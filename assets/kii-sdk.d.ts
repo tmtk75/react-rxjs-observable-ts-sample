@@ -18,7 +18,7 @@ declare module "kii-sdk" {
     topicWithName(name: string): KiiTopic;
     save(): Promise<KiiGroup>;
     addUser(u: KiiUser): void;
-    getMemberList(): Promise<any>;
+    getMemberList(): Promise<[KiiGroup, Array<KiiUser>]>;
   }
 
   export class KiiUser {

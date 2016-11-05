@@ -170,6 +170,13 @@ const connectionLostEpic = (a: ActionsObservable<any>, store: Redux.Store<{kiicl
 //      return {user, group}
 //    })
 //}
+  //
+const loadMembersEpic = Epic.fromPromise(
+  "LOAD-MEMBERS",
+  ({payload}: Action<KiiGroup>) =>
+    payload.getMemberList()
+      .then(([group, members]) => members.map(e => e.refresh()))
+)
 
 export const rootEpic = combineEpics(
   joinEpic,
@@ -182,4 +189,5 @@ export const rootEpic = combineEpics(
     signOutEpic,
   ),
   connectionLostEpic,
+  loadMembersEpic,
 );

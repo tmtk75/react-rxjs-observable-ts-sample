@@ -26,7 +26,10 @@ const profile = handleActions({
 
   "CONNECT.resolved": (s: ProfileState, a: Action<{topic: KiiTopic}>) =>
     assign({}, s, a.payload),
-}, {} /* initial state */)
+
+  "LOAD-MEMBERS.resolved": (s: any, a: Action<any>) =>
+    assign({}, s, {members: a.payload}),
+}, {members: []} /* initial state */)
 
 const mqtt = handleActions({
   "CONNECTION-ALIVE": (s: MQTTState, a: Action<{endpoint: KiiMqttEndpoint, client: Paho.MQTT.Client}>) =>

@@ -148,6 +148,27 @@ class Message extends React.Component<AppProps, {status: string}> {
   }
 }
 
+class Member extends React.Component<AppProps, {}> {
+  constructor(props: AppProps) {
+    super(props)
+  }
+  render() {
+    const { dispatch, kiicloud: { profile: { group, members } } } = this.props;
+    return (
+      <div>
+        <FlatButton
+          label="load members"
+          disabled={!group}
+          onClick={_ => dispatch(createAction("LOAD-MEMBERS")(group))}
+          />
+        <ul>{
+          members.map(e => <li key={e.getUUID()}>uuid: {e.getUUID()}</li>)
+        }</ul>
+      </div>
+    )
+  }
+}
+
 class Debug extends React.Component<AppProps, {}> {
   constructor(props: AppProps) {
     super(props);
@@ -171,6 +192,7 @@ export default class App extends React.Component<AppProps, {}> {
         <Login {...this.props}/>
         <Connect {...this.props}/>
         <Message {...this.props}/>
+        <Member {...this.props}/>
         <hr />
         <Debug {...this.props}/>
       </div>
