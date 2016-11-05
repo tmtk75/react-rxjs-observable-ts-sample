@@ -56,7 +56,7 @@ declare module "kii-sdk" {
 
   export class KiiPushSubscription {
     isSubscribed(t: KiiTopic): Promise<[KiiPushSubscription, KiiTopic, boolean]>;
-    subscribe(t: KiiTopic): Promise<any>
+    subscribe(t: KiiTopic): Promise<[KiiPushSubscription, KiiTopic]>
   }
 
   export class KiiPushMessage {

@@ -71,15 +71,8 @@ function getTopic(group: KiiGroup, name: string): Promise<KiiTopic> {
   return group.listTopics()
     .then(([[topic], _]) => topic ? topic : group.topicWithName(name).save())
     .then(topic => KiiUser.getCurrentUser().pushSubscription().isSubscribed(topic))
-    .then(([psub, topic, b]) => b ? topic : psub.subscribe(topic))
-    .then(payload => {
-      //TODO: Not so cool
-      if (payload instanceof KiiTopic) {
-        return payload;
-      }
-      const [a, b] = payload;
-      return b;
-    })
+    .then(([psub, topic, b]) => b ? Promise.resolve([psub, topic]) : psub.subscribe(topic))
+    .then(([sub, topic]) => topic)
 }
 
 function connectWS(ep: KiiMqttEndpoint, store: Redux.Store<{kiicloud: KiiCloudState}>): Promise<Paho.MQTT.Client> {

@@ -3,22 +3,22 @@ import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint } from "kii-sdk"
 
 declare global {
   type KiiCloudState = {
-      profile: ProfileState,
-      mqtt: MQTTState,
+      readonly profile: ProfileState,
+      readonly mqtt: MQTTState,
   }
 
   type ProfileState = {
-    user: KiiUser,
-    group: KiiGroup,
-    groups: Array<KiiGroup>,
-    topic: KiiTopic,
-    members: Array<KiiUser>,
+    readonly user: KiiUser,
+    readonly group: KiiGroup,
+    readonly groups: Array<KiiGroup>,
+    readonly topic: KiiTopic,
+    readonly members: Array<KiiUser>,
   }
 
   type MQTTState = {
-     endpoint: KiiMqttEndpoint,
-     client: Paho.MQTT.Client,
-     retryCount: number,
+     readonly endpoint: KiiMqttEndpoint,
+     readonly client: Paho.MQTT.Client,
+     readonly retryCount: number,
   }
 }
 
