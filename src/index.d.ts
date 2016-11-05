@@ -3,6 +3,7 @@ import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint } from "kii-sdk"
 import { StoreCreator } from "redux"
 
 declare global {
+
   type KiiCloudState = {
       readonly profile: ProfileState,
       readonly mqtt: MQTTState,
@@ -21,9 +22,7 @@ declare global {
      readonly client: Paho.MQTT.Client,
      readonly retryCount: number,
   }
-}
 
-declare global {
   type SendMessagePayload = {
     topic: KiiTopic,
     status: {
@@ -43,16 +42,15 @@ declare global {
   type JoinPayload = {
     github_token: string,
   }
+
+  interface Window {
+    devToolsExtension(): StoreCreator;
+  }
+
 }
 
 declare module "redux-actions" {
   type actionMap = {[key: string]: any}
 
   export function createActions(actions: actionMap, ...keys: string[]): any;
-}
-
-declare global {
-  interface Window {
-    devToolsExtension(): StoreCreator;
-  }
 }

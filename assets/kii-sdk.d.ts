@@ -1,6 +1,6 @@
 declare module "kii-sdk" {
 
-  export class Kii {
+  class Kii {
     static initializeWithSite(app_id: string, app_key: string, endpoint_url: string): void;
     static serverCodeEntry(name: string): KiiServerCodeEntry;
   }
@@ -9,11 +9,11 @@ declare module "kii-sdk" {
     getReturnedValue(): {returnedValue: any};
   }
 
-  export class KiiServerCodeEntry {
+  class KiiServerCodeEntry {
     execute(arg: Object): Promise<[string /*entry*/, Object /*args*/, KiiServerCodeExecResult]>;
   }
 
-  export class KiiGroup {
+  class KiiGroup {
     static groupWithID(id: string): KiiGroup;
     static registerGroupWithID(id: string, name: string, members: Array<KiiUser>): Promise<KiiGroup>;
     refresh(): Promise<KiiGroup>;
@@ -25,7 +25,7 @@ declare module "kii-sdk" {
     getMemberList(): Promise<[KiiGroup, Array<KiiUser>]>;
   }
 
-  export class KiiUser {
+  class KiiUser {
     static userWithUsername(username: string, password: string): KiiUser;
     static userWithURI(uri: string): KiiUser;
     static authenticateWithToken(token: string): Promise<KiiUser>;
@@ -43,23 +43,23 @@ declare module "kii-sdk" {
     memberOfGroups(): Promise<[KiiUser, Array<KiiGroup>]>;
   }
 
-  export class KiiTopic {
+  class KiiTopic {
     save(): Promise<KiiTopic>;
     sendMessage(msg: KiiPushMessage): Promise<KiiTopic>;
     getName(): string;
   }
 
-  export class KiiPushInstallation {
+  class KiiPushInstallation {
     installMqtt(dev: boolean): Promise<{installationID: string}>;
     getMqttEndpoint(instID: string): Promise<KiiMqttEndpoint>;
   }
 
-  export class KiiPushSubscription {
+  class KiiPushSubscription {
     isSubscribed(t: KiiTopic): Promise<[KiiPushSubscription, KiiTopic, boolean]>;
     subscribe(t: KiiTopic): Promise<[KiiPushSubscription, KiiTopic]>
   }
 
-  export class KiiPushMessage {
+  class KiiPushMessage {
     objectScopeGroupID: string; // 'kiicorp'
     sender:             string; // '3639fcbfbba0-e…87f4'
     sourceURI:          string; // 'kiicloud://gro…atus'
@@ -71,12 +71,12 @@ declare module "kii-sdk" {
     when:               number; // 1478324740503
   }
 
-  export class KiiPushMessageBuilder {
+  class KiiPushMessageBuilder {
     constructor(a: Object | string | number);
     build(): KiiPushMessage;
   }
 
-  export interface KiiMqttEndpoint {
+  interface KiiMqttEndpoint {
     readonly host: string;
     readonly portWS: number;
     readonly username: string;
@@ -85,4 +85,3 @@ declare module "kii-sdk" {
   }
 
 }
-
