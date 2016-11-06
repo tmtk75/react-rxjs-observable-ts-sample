@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Dispatch } from "redux"
-import { createAction, Action } from "redux-actions"
+import { Action } from "redux-actions"
 import { FlatButton, TextField } from "material-ui"
 import {
   connect,
@@ -10,6 +10,8 @@ import {
   signIn,
   signOut,
   join,
+  sendMessage,
+  loadLatestMessages,
 } from "./action"
 import { KiiUser, KiiPushMessage } from "kii-sdk"
 
@@ -132,22 +134,22 @@ class Message extends React.Component<AppProps, {status: string}> {
           errorText={!!this.state.status && !client ? "not connected" : null}
           value={this.state.status}
           onChange={(e: React.FormEvent<TextField>) => this.setState({status: (e.target as any).value})}
-          onKeyDown={e => e.keyCode === 13 ? this.sendMessage(e) : null}
+          onKeyDown={e => e.keyCode === 13 ? this.handleSendMessage(e) : null}
           />
         <FlatButton
           label="send"
           disabled={!(client && user) || !this.state.status}
-          onClick={this.sendMessage.bind(this)}
+          onClick={this.handleSendMessage.bind(this)}
           />
       </div>
     )
   }
-  sendMessage(e: React.FormEvent<TextField & FlatButton> | React.KeyboardEvent<{}>) {
+  handleSendMessage(e: React.FormEvent<TextField & FlatButton> | React.KeyboardEvent<{}>) {
     const { dispatch, kiicloud: { profile: { user, topic, group } } } = this.props;
     if (!topic) {
       return;
     }
-    dispatch(createAction("SEND-MESSAGE")({group, topic, status: {message: this.state.status}}));
+    dispatch(sendMessage({group, topic, status: {message: this.state.status}}));
     this.setState({status: ""});
   }
 }
@@ -204,7 +206,7 @@ class Debug extends React.Component<AppProps, {}> {
         <FlatButton
           label="load latest messages"
           disabled={!group}
-          onClick={_ => dispatch(createAction("LOAD-LATEST-MESSAGES")(group))}
+          onClick={_ => dispatch(loadLatestMessages(group))}
           />
       </div>
     )

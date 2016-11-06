@@ -59,7 +59,7 @@ declare global {
   type StatusMessages = Array<StatusMessage>
 
   type StatusMessage = {
-    sender: UserID,
+    sender?: UserID,
     message: StatusText,
   }
 
