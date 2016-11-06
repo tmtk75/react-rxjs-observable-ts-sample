@@ -186,6 +186,7 @@ class Debug extends React.Component<AppProps, {}> {
   }
   render() {
     const {
+      dispatch,
       kiicloud: { profile: { user, group } },
       messages: {
         last,
@@ -202,6 +203,11 @@ class Debug extends React.Component<AppProps, {}> {
         <div>group: {group ? group.getName() : null}</div>
         <div>last-message: {value ? value.toString() : null}</div>
         <div>error: {rejected ? rejected.message : null}</div>
+        <FlatButton
+          label="load latest messages"
+          disabled={!group}
+          onClick={_ => dispatch(createAction("LOAD-LATEST-MESSAGES")(group))}
+          />
       </div>
     )
   }

@@ -1,6 +1,6 @@
 import { handleActions, Action } from "redux-actions"
 import { combineReducers } from "redux"
-import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint, KiiPushMessage } from "kii-sdk"
+import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint, KiiPushMessage, KiiObject } from "kii-sdk"
 import * as Paho from "paho"
 import { Map } from "immutable"
 
@@ -50,12 +50,20 @@ const mqtt = handleActions({
 }, {} /* initial state */)
 
 const messages = handleActions({
-  "MESSAGE-ARRIVED":  (s: MessagesState, { payload }: Action<KiiPushMessage>) =>
+  "MESSAGE-ARRIVED":  (s: MessagesState, a: Action<KiiPushMessage>) =>
     assign({}, s, {
-      last: payload,
-      pushMessages: s.pushMessages.set(payload.sender, JSON.parse(payload.value).message),
+      last: a.payload,
+      pushMessages: s.pushMessages.set(a.payload.sender, JSON.parse(a.payload.value).message),
     }),
-}, {last: {}, pushMessages: Map()} /* initial state */)
+
+//  "LOAD-LATEST-MESSAGES.resolved": (s: MessagesState, a: Action<Array<KiiObject>>) => {
+//    console.log(a.payload);
+//    return assign({}, s, {
+//      last: null as KiiPushMessage,
+//      pushMessages: s.pushMessages,
+//    });
+//  },
+}, {last: {}, pushMessages: Map<UserID, StatusText>()} /* initial state */)
 
 const members = handleActions({
   "LOAD-MEMBERS.resolved":  (s: MembersState, a: Action<Array<KiiUser>>) =>

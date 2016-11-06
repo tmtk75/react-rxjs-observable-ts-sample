@@ -15,11 +15,16 @@ declare module "kii-sdk" {
 
   class KiiObject {
     set(key: string, value: any): void;
-    saveAllFields(): Promise<any>;
+    saveAllFields(): Promise<{createdAt: number, modifiedAt: number}>;
+  }
+
+  class KiiQuery {
+    static queryWithClause(c: any): KiiQuery;
   }
 
   class KiiBucket {
     createObjectWithID(id: string): KiiObject;
+    executeQuery(q: KiiQuery): Promise<[KiiQuery, Array<KiiObject>, KiiQuery /*next*/]>;
   }
 
   class KiiGroup {
@@ -70,13 +75,13 @@ declare module "kii-sdk" {
   }
 
   class KiiPushMessage {
-    objectScopeGroupID: string; // 'kiicorp'
+    //objectScopeGroupID: string; // 'kiicorp'
     sender:             string; // '3639fcbfbba0-e…87f4'
-    sourceURI:          string; // 'kiicloud://gro…atus'
-    objectScopeType:    string; // 'APP_AND_GROUP'
-    topic:              string; // 'status'
-    objectScopeAppID:   string; // '2cdc6549'
-    senderURI:          string; // 'kiicloud://use…87f4'
+    //sourceURI:          string; // 'kiicloud://gro…atus'
+    //objectScopeType:    string; // 'APP_AND_GROUP'
+    //topic:              string; // 'status'
+    //objectScopeAppID:   string; // '2cdc6549'
+    ///senderURI:          string; // 'kiicloud://use…87f4'
     value:              string; // '{"message":"asdf"}'
     when:               number; // 1478324740503
   }

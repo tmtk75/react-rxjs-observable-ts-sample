@@ -4,7 +4,7 @@ import 'rxjs/add/operator/map'
 import { combineEpics, ActionsObservable } from 'redux-observable'
 import * as Paho from "paho"
 import {
-  Kii, KiiUser, KiiGroup, KiiTopic, KiiPushMessageBuilder, KiiPushMessage, KiiMqttEndpoint,
+  Kii, KiiUser, KiiGroup, KiiTopic, KiiPushMessageBuilder, KiiPushMessage, KiiMqttEndpoint, KiiQuery,
 } from "kii-sdk"
 import { connect, disconnect } from "./action"
 
@@ -104,7 +104,7 @@ function connectWS(ep: KiiMqttEndpoint, store: Redux.Store<{kiicloud: KiiCloudSt
 
 function updateMessage(g: KiiGroup, msg: StatusMessage): Promise<{}> {
   const u = KiiUser.getCurrentUser();
-  const e = g.bucketWithName("latest").createObjectWithID(u.getUsername());
+  const e = g.bucketWithName(LATEST_MESSAGE_BUCKET_NAME).createObjectWithID(u.getUsername());
   e.set("status", msg)
   return e.saveAllFields();
 }
@@ -179,6 +179,16 @@ const loadMembersEpic = Epic.fromPromise(
       .then(([group, members]) => Promise.all(members.map(e => e.refresh())))
 )
 
+const LATEST_MESSAGE_BUCKET_NAME = "latest"
+
+const loadLatestMessagesEpic = Epic.fromPromise(
+  "LOAD-LATEST-MESSAGES",
+  ({payload}: Action<KiiGroup>) =>
+    payload.bucketWithName(LATEST_MESSAGE_BUCKET_NAME)
+      .executeQuery(KiiQuery.queryWithClause(null))
+      .then(([_, results]) => results)
+)
+
 export const rootEpic = combineEpics(
   joinEpic,
   connectEpic,
@@ -191,4 +201,5 @@ export const rootEpic = combineEpics(
   ),
   connectionLostEpic,
   loadMembersEpic,
-);
+  loadLatestMessagesEpic,
+)
