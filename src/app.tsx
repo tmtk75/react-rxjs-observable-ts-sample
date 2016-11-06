@@ -6,6 +6,10 @@ import {
   connect,
   disconnect,
   loadMembers,
+  signUp,
+  signIn,
+  signOut,
+  join,
 } from "./action"
 import { KiiUser, KiiPushMessage } from "kii-sdk"
 
@@ -35,6 +39,7 @@ class Login extends React.Component<AppProps, LoginState> {
   }
   render() {
     const { dispatch, kiicloud: { profile: { user } } } = this.props;
+    const { username, password } = this.state;
     return (
       <div>
         <TextField
@@ -55,23 +60,17 @@ class Login extends React.Component<AppProps, LoginState> {
         <FlatButton
           label="sign up"
           disabled={!!user}
-          onClick={_ => dispatch(createAction("SIGN-UP")({
-            username: this.state.username,
-            password: this.state.password,
-          }))}
+          onClick={_ => dispatch(signUp({username, password}))}
           />
         <FlatButton
           label="sign in"
           disabled={!!user}
-          onClick={_ => dispatch(createAction("SIGN-IN")({
-            username: this.state.username,
-            password: this.state.password,
-          }))}
+          onClick={_ => dispatch(signIn({username, password}))}
           />
         <FlatButton
           label="sign out"
           disabled={!user}
-          onClick={_ => dispatch(createAction("SIGN-OUT")())}
+          onClick={_ => dispatch(signOut())}
           />
       </div>
     )
@@ -99,9 +98,7 @@ class Connect extends React.Component<AppProps, {github_token: string}> {
         <FlatButton
           label="join"
           disabled={!user || !this.state.github_token}
-          onClick={_ => dispatch(createAction("JOIN")({
-            github_token: this.state.github_token,
-          }))}
+          onClick={_ => dispatch(join({github_token: this.state.github_token}))}
           />
         <FlatButton
           label="connect"

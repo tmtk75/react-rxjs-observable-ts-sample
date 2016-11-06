@@ -14,3 +14,11 @@ export const disconnect = createAction<KiiCloudState, void>("DISCONNECT", ({ mqt
 })
 
 export const loadMembers = createAction<KiiGroup>("LOAD-MEMBERS")
+
+export const signUp = createAction<SignUpPayload>("SIGN-UP")
+
+export const signIn = createAction<SignInPayload>("SIGN-IN")
+
+export const signOut = createAction<void>("SIGN-OUT")
+
+export const join = createAction<{github_token: string}>("JOIN")
