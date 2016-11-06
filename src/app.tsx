@@ -5,6 +5,7 @@ import { FlatButton, TextField } from "material-ui"
 import {
   connect,
   disconnect,
+  loadMembers,
 } from "./action"
 import { KiiUser, KiiPushMessage } from "kii-sdk"
 
@@ -165,7 +166,7 @@ class Member extends React.Component<AppProps, {}> {
         <FlatButton
           label="load members"
           disabled={!group}
-          onClick={_ => dispatch(createAction("LOAD-MEMBERS")(group))}
+          onClick={_ => dispatch(loadMembers(group))}
           />
         {group ? ` for ${group.getName()}` : null}
         <ul>{

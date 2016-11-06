@@ -187,6 +187,16 @@ const loadLatestMessages = (g: KiiGroup): Promise<StatusMessage> =>
       message: e.get(FIELD_STATUS).message,
     })))
 
+const loadMembersEpic = combineEpics(
+  Epic.fromPromise("LOAD-MEMBERS", ({payload}: Action<KiiGroup>) => loadMembers(payload)),
+
+  Epic.fromPromise("LOAD-LATEST-MESSAGES", ({payload}: Action<KiiGroup>) => loadLatestMessages(payload)),
+
+  (a: ActionsObservable<KiiGroup>, store: Redux.Store<{}>) =>
+    a.ofType("LOAD-MEMBERS")
+      .map(({type, payload}) => ({type: "LOAD-LATEST-MESSAGES", payload})),
+)
+
 export const rootEpic = combineEpics(
   joinEpic,
   connectEpic,
@@ -198,9 +208,5 @@ export const rootEpic = combineEpics(
     signOutEpic,
   ),
   connectionLostEpic,
-  Epic.fromPromise("LOAD-MEMBERS", ({payload}: Action<KiiGroup>) => loadMembers(payload)),
-  Epic.fromPromise("LOAD-LATEST-MESSAGES", ({payload}: Action<KiiGroup>) => loadLatestMessages(payload)),
-  (a: ActionsObservable<KiiGroup>, store: Redux.Store<{}>) =>
-    a.ofType("LOAD-MEMBERS")
-      .map(({type, payload}) => ({type: "LOAD-LATEST-MESSAGES", payload})),
+  loadMembersEpic,
 )
