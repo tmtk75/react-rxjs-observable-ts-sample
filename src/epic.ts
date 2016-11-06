@@ -105,7 +105,7 @@ function connectWS(ep: KiiMqttEndpoint, store: Redux.Store<{kiicloud: KiiCloudSt
 function updateMessage(g: KiiGroup, msg: StatusMessage): Promise<{}> {
   const u = KiiUser.getCurrentUser();
   const e = g.bucketWithName(LATEST_MESSAGE_BUCKET_NAME).createObjectWithID(u.getUsername());
-  e.set("status", msg)
+  e.set(FIELD_STATUS, msg)
   return e.saveAllFields();
 }
 
@@ -130,7 +130,7 @@ const connectEpic = Epic.fromPromise(
   "CONNECT",
   ({ payload }: Action<ConnectPayload>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
     getMQTTEndpoint(KiiUser.getCurrentUser())
-      .then(endpoint => getTopic(payload, "status")
+      .then(endpoint => getTopic(payload, FIELD_STATUS)
         .then(topic => connectWS(endpoint, store)
           .then(_ => ({topic}))))
 )
@@ -172,25 +172,20 @@ const connectionLostEpic = (a: ActionsObservable<{}>, store: Redux.Store<{kiiclo
 //    })
 //}
 
-const loadMembersEpic = Epic.fromPromise(
-  "LOAD-MEMBERS",
-  ({payload}: Action<KiiGroup>) =>
-    payload.getMemberList()
-      .then(([group, members]) => Promise.all(members.map(e => e.refresh())))
-)
+const loadMembers = (g: KiiGroup) =>
+  g.getMemberList()
+    .then(([group, members]) => Promise.all(members.map(e => e.refresh())))
 
-const LATEST_MESSAGE_BUCKET_NAME = "latest"
+const LATEST_MESSAGE_BUCKET_NAME = "latest";
+const FIELD_STATUS = "status";
 
-const loadLatestMessagesEpic = Epic.fromPromise(
-  "LOAD-LATEST-MESSAGES",
-  ({payload}: Action<KiiGroup>) =>
-    payload.bucketWithName(LATEST_MESSAGE_BUCKET_NAME)
-      .executeQuery(KiiQuery.queryWithClause(null))
-      .then(([_, results]) => results.map(e => ({
-        sender: (e as any)._owner.getUUID(),
-        message: e.get("status").message,
-      })))
-)
+const loadLatestMessages = (g: KiiGroup): Promise<StatusMessage> =>
+  g.bucketWithName(LATEST_MESSAGE_BUCKET_NAME)
+    .executeQuery(KiiQuery.queryWithClause(null))
+    .then(([_, results]) => results.map(e => ({
+      sender: (e as any)._owner.getUUID(),
+      message: e.get(FIELD_STATUS).message,
+    })))
 
 export const rootEpic = combineEpics(
   joinEpic,
@@ -203,6 +198,6 @@ export const rootEpic = combineEpics(
     signOutEpic,
   ),
   connectionLostEpic,
-  loadMembersEpic,
-  loadLatestMessagesEpic,
+  Epic.fromPromise("LOAD-MEMBERS", ({payload}: Action<KiiGroup>) => loadMembers(payload)),
+  Epic.fromPromise("LOAD-LATEST-MESSAGES", ({payload}: Action<KiiGroup>) => loadLatestMessages(payload)),
 )
