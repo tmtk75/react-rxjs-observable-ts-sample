@@ -1,5 +1,5 @@
 import { Action } from "redux-actions"
-import * as Rx from "rxjs"
+import { Observable } from "rxjs"
 import 'rxjs/add/operator/map'
 import { combineEpics, ActionsObservable } from 'redux-observable'
 import * as Paho from "paho"
@@ -14,7 +14,7 @@ namespace Epic {
 
   export const fromPromise = <P, S, R>(type: string, genPromise: ToPromise<P, S, R>) =>
     (a: ActionsObservable<P>, store: Redux.Store<S>) => a.ofType(type)
-      .mergeMap(action => Rx.Observable.fromPromise(genPromise(action, store)
+      .mergeMap(action => Observable.fromPromise(genPromise(action, store)
         .catch(err => ({
           type: `${type}.rejected`,
           payload: err,
@@ -136,7 +136,7 @@ const connectEpic = Epic.fromPromise(
 )
 
 const connectionLostEpic = (a: ActionsObservable<{}>, store: Redux.Store<{kiicloud: KiiCloudState}>) =>
-  Rx.Observable.of(
+  Observable.of(
     a.ofType("CONNECTION-LOST")
       .filter(_ => !!store.getState().kiicloud.profile.user)
       .mapTo({type: "CONNECT.start-retry"}),
@@ -150,7 +150,7 @@ const connectionLostEpic = (a: ActionsObservable<{}>, store: Redux.Store<{kiiclo
     a.ofType("CONNECT.retry")
       .map(_ => 1000 * (2 ** (store.getState().kiicloud.mqtt.retryCount - 1)))
       .do(t => console.log(`retry connecting ${t}ms later.`))
-      .delayWhen(t => Rx.Observable.of(true).delay(t as number))
+      .delayWhen(t => Observable.of(true).delay(t as number))
       .map(x => connect(store.getState().kiicloud.profile.group)),
 
     a.ofType("CONNECT.resolved")
@@ -200,4 +200,7 @@ export const rootEpic = combineEpics(
   connectionLostEpic,
   Epic.fromPromise("LOAD-MEMBERS", ({payload}: Action<KiiGroup>) => loadMembers(payload)),
   Epic.fromPromise("LOAD-LATEST-MESSAGES", ({payload}: Action<KiiGroup>) => loadLatestMessages(payload)),
+  (a: ActionsObservable<KiiGroup>, store: Redux.Store<{}>) =>
+    a.ofType("LOAD-MEMBERS")
+      .map(({type, payload}) => ({type: "LOAD-LATEST-MESSAGES", payload})),
 )
