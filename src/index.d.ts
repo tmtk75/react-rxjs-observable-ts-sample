@@ -24,9 +24,6 @@ declare global {
      readonly retryCount: number,
   }
 
-  type UserID = string;
-  type StatusText = string;
-
   type MessagesState = {
     readonly last: KiiPushMessage,
     readonly pushMessages: Map<UserID, StatusText>,
@@ -34,15 +31,6 @@ declare global {
 
   type MembersState = {
     users: Map<UserID, KiiUser>;
-  }
-
-  type LoadedMessages = Array<{
-    sender: string,
-    message: string,
-  }>
-
-  type StatusMessage = {
-    message: string,
   }
 
   type SendMessagePayload = {
@@ -62,6 +50,17 @@ declare global {
 
   type JoinPayload = {
     github_token: string,
+  }
+
+  type UserID = string;
+
+  type StatusText = string;
+
+  type StatusMessages = Array<StatusMessage>
+
+  type StatusMessage = {
+    sender: UserID,
+    message: StatusText,
   }
 
   interface Window {

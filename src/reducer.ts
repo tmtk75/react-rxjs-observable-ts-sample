@@ -1,6 +1,6 @@
 import { handleActions, Action } from "redux-actions"
 import { combineReducers } from "redux"
-import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint, KiiPushMessage, KiiObject } from "kii-sdk"
+import { KiiUser, KiiGroup, KiiTopic, KiiMqttEndpoint, KiiObject, KiiPushMessage } from "kii-sdk"
 import * as Paho from "paho"
 import { Map } from "immutable"
 
@@ -56,7 +56,7 @@ const messages = handleActions({
       pushMessages: s.pushMessages.set(payload.sender, JSON.parse(payload.value).message),
     }),
 
-  "LOAD-LATEST-MESSAGES.resolved": (s: MessagesState, {payload}: Action<LoadedMessages & KiiPushMessage /* workaround */>) =>
+  "LOAD-LATEST-MESSAGES.resolved": (s: MessagesState, {payload}: Action<StatusMessages & KiiPushMessage /* workaround */>) =>
     assign({}, s, {
       pushMessages: Map(payload.map(e => [e.sender, e.message])),
     }),
