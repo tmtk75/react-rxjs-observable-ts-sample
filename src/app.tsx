@@ -145,11 +145,11 @@ class Message extends React.Component<AppProps, {status: string}> {
     )
   }
   sendMessage(e: React.FormEvent<TextField & FlatButton> | React.KeyboardEvent<{}>) {
-    const { dispatch, kiicloud: { profile: { topic, group } } } = this.props;
+    const { dispatch, kiicloud: { profile: { user, topic, group } } } = this.props;
     if (!topic) {
       return;
     }
-    dispatch(createAction("SEND-MESSAGE")({group, topic, status: {message: this.state.status}}))
+    dispatch(createAction("SEND-MESSAGE")({group, topic, status: {message: this.state.status}}));
     this.setState({status: ""});
   }
 }

@@ -186,7 +186,10 @@ const loadLatestMessagesEpic = Epic.fromPromise(
   ({payload}: Action<KiiGroup>) =>
     payload.bucketWithName(LATEST_MESSAGE_BUCKET_NAME)
       .executeQuery(KiiQuery.queryWithClause(null))
-      .then(([_, results]) => results)
+      .then(([_, results]) => results.map(e => ({
+        sender: (e as any)._owner.getUUID(),
+        message: e.get("status").message,
+      })))
 )
 
 export const rootEpic = combineEpics(

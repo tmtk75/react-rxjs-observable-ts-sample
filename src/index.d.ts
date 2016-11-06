@@ -36,8 +36,13 @@ declare global {
     users: Map<UserID, KiiUser>;
   }
 
+  type LoadedMessages = Array<{
+    sender: string,
+    message: string,
+  }>
+
   type StatusMessage = {
-    message: string;
+    message: string,
   }
 
   type SendMessagePayload = {

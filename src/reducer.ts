@@ -50,19 +50,16 @@ const mqtt = handleActions({
 }, {} /* initial state */)
 
 const messages = handleActions({
-  "MESSAGE-ARRIVED":  (s: MessagesState, a: Action<KiiPushMessage>) =>
+  "MESSAGE-ARRIVED":  (s: MessagesState, {payload}: Action<KiiPushMessage>) =>
     assign({}, s, {
-      last: a.payload,
-      pushMessages: s.pushMessages.set(a.payload.sender, JSON.parse(a.payload.value).message),
+      last: payload,
+      pushMessages: s.pushMessages.set(payload.sender, JSON.parse(payload.value).message),
     }),
 
-//  "LOAD-LATEST-MESSAGES.resolved": (s: MessagesState, a: Action<Array<KiiObject>>) => {
-//    console.log(a.payload);
-//    return assign({}, s, {
-//      last: null as KiiPushMessage,
-//      pushMessages: s.pushMessages,
-//    });
-//  },
+  "LOAD-LATEST-MESSAGES.resolved": (s: MessagesState, {payload}: Action<LoadedMessages & KiiPushMessage /* workaround */>) =>
+    assign({}, s, {
+      pushMessages: Map(payload.map(e => ["", e.message])),
+    }),
 }, {last: {}, pushMessages: Map<UserID, StatusText>()} /* initial state */)
 
 const members = handleActions({

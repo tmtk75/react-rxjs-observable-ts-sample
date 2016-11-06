@@ -14,6 +14,7 @@ declare module "kii-sdk" {
   }
 
   class KiiObject {
+    get(key: string): any;
     set(key: string, value: any): void;
     saveAllFields(): Promise<{createdAt: number, modifiedAt: number}>;
   }
