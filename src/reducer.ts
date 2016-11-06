@@ -58,7 +58,7 @@ const messages = handleActions({
 
   "LOAD-LATEST-MESSAGES.resolved": (s: MessagesState, {payload}: Action<LoadedMessages & KiiPushMessage /* workaround */>) =>
     assign({}, s, {
-      pushMessages: Map(payload.map(e => ["", e.message])),
+      pushMessages: Map(payload.map(e => [e.sender, e.message])),
     }),
 }, {last: {}, pushMessages: Map<UserID, StatusText>()} /* initial state */)
 
