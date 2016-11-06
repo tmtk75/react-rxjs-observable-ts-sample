@@ -102,7 +102,14 @@ function connectWS(ep: KiiMqttEndpoint, store: Redux.Store<{kiicloud: KiiCloudSt
   })
 }
 
-function sendMessage(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Promise<{}> {
+function updateMessage(g: KiiGroup, msg: StatusMessage): Promise<{}> {
+  const u = KiiUser.getCurrentUser();
+  const e = g.bucketWithName("latest").createObjectWithID(u.getUsername());
+  e.set("status", msg)
+  return e.saveAllFields();
+}
+
+function sendMessage(topic: KiiTopic, m: StatusMessage): Promise<{}> {
   const data = {value: JSON.stringify(m)};
   const msg = new KiiPushMessageBuilder(data).build()
   return topic.sendMessage(msg)
@@ -110,7 +117,8 @@ function sendMessage(topic: KiiTopic, m: Object = {id: 12345, m: "hello"}): Prom
 
 const sendStatusEpic = Epic.fromPromise(
   "SEND-MESSAGE",
-  ({ payload: { topic, status } }: Action<SendMessagePayload>) => sendMessage(topic, status)
+  ({ payload: { group, topic, status } }: Action<SendMessagePayload>) =>
+    updateMessage(group, status).then(_ => sendMessage(topic, status))
 )
 
 //const messageArrivedEpic = epicFromPromise("MESSAGE-ARRIVED", (a: Action<KiiPushMessage>) =>

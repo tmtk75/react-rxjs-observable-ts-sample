@@ -13,6 +13,15 @@ declare module "kii-sdk" {
     execute(arg: Object): Promise<[string /*entry*/, Object /*args*/, KiiServerCodeExecResult]>;
   }
 
+  class KiiObject {
+    set(key: string, value: any): void;
+    saveAllFields(): Promise<any>;
+  }
+
+  class KiiBucket {
+    createObjectWithID(id: string): KiiObject;
+  }
+
   class KiiGroup {
     static groupWithID(id: string): KiiGroup;
     static registerGroupWithID(id: string, name: string, members: Array<KiiUser>): Promise<KiiGroup>;
@@ -23,6 +32,7 @@ declare module "kii-sdk" {
     save(): Promise<KiiGroup>;
     addUser(u: KiiUser): void;
     getMemberList(): Promise<[KiiGroup, Array<KiiUser>]>;
+    bucketWithName(name: string): KiiBucket;
   }
 
   class KiiUser {

@@ -145,11 +145,11 @@ class Message extends React.Component<AppProps, {status: string}> {
     )
   }
   sendMessage(e: React.FormEvent<TextField & FlatButton> | React.KeyboardEvent<{}>) {
-    const { dispatch, kiicloud: { profile: { topic } } } = this.props;
+    const { dispatch, kiicloud: { profile: { topic, group } } } = this.props;
     if (!topic) {
       return;
     }
-    dispatch(createAction("SEND-MESSAGE")({topic, status: {message: this.state.status}}))
+    dispatch(createAction("SEND-MESSAGE")({group, topic, status: {message: this.state.status}}))
     this.setState({status: ""});
   }
 }
@@ -196,18 +196,11 @@ class Debug extends React.Component<AppProps, {}> {
       error: { rejected }
     } = this.props;
 
-    let sender: KiiUser;
-    if (last && members) {
-      sender = members.users.get(last.sender);
-    }
     return (
       <div>
         <div>user: {user ? user.getUsername() : null}</div>
         <div>group: {group ? group.getName() : null}</div>
-        <div>
-          last-message: {value ? value.toString() : null}
-          {sender ? " by " + sender.getUsername() : null}
-        </div>
+        <div>last-message: {value ? value.toString() : null}</div>
         <div>error: {rejected ? rejected.message : null}</div>
       </div>
     )

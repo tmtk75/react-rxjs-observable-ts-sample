@@ -36,11 +36,14 @@ declare global {
     users: Map<UserID, KiiUser>;
   }
 
+  type StatusMessage = {
+    message: string;
+  }
+
   type SendMessagePayload = {
+    group: KiiGroup;
     topic: KiiTopic,
-    status: {
-      message: string,
-    },
+    status: StatusMessage;
   }
 
   type ConnectPayload = KiiGroup;
